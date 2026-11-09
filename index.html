@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planilha Premiada — SENAI Afonso Pena · TGDQ</title>
+<style>
+:root{--green:#217346;--green-d:#185a36;--green-l:#e3f1ea;--bg:#eef3f0;--ink:#1d2b24;--mut:#5b6b63;--line:#cfd9d3;--red:#c0392b;--red-l:#fbe9e7;--gold:#f2b705;--card:#fff}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.45}
+.topbar{background:var(--green);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;position:sticky;top:0;z-index:10}
+.brand{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;font-size:18px}
+.brand span{font-size:12px;opacity:.85}
+.topbar button{background:rgba(255,255,255,.18);border:0;color:#fff;border-radius:8px;padding:6px 10px;font-size:18px;cursor:pointer}
+.wrap{max-width:860px;margin:0 auto;padding:16px;display:grid;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 2px 0 rgba(0,0,0,.04)}
+.hero{text-align:center;padding:28px 18px}
+.hero h1,.hero h2{margin:.2em 0}
+.big{font-size:64px;line-height:1}
+.mut{color:var(--mut)}
+.pop{animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.btn{background:var(--green);color:#fff;border:0;border-radius:12px;padding:13px 22px;font:inherit;font-weight:700;font-size:17px;cursor:pointer;box-shadow:0 4px 0 var(--green-d);margin:6px}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--green-d)}
+.btn.alt{background:#fff;color:var(--green-d);border:2px solid var(--green);box-shadow:none}
+.how{text-align:left;max-width:560px;margin:14px auto;padding-left:20px}
+.how li{margin:6px 0}
+.credits{font-size:13px;color:var(--mut);margin-top:14px}
+.stats{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.pill{background:#f4f8f6;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-weight:600;font-size:14px}
+.xprow{display:flex;justify-content:space-between;font-size:13px;color:var(--mut);margin:10px 0 4px}
+.bar{height:14px;background:#dfe8e3;border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),#4cb782);transition:width .6s}
+.boss .bar>i{background:linear-gradient(90deg,#c0392b,#e67e22)}
+.ladder{display:flex;gap:4px;margin-top:10px}
+.ladder span{flex:1;height:8px;border-radius:4px;background:#dfe8e3}
+.ladder .done{background:var(--green)}
+.ladder .cur{background:var(--gold)}
+.ladder .goal{background:repeating-linear-gradient(45deg,#dfe8e3,#dfe8e3 4px,#f3d778 4px,#f3d778 8px)}
+.sheetwrap{overflow-x:auto;border:1px solid #b9c7bf;border-radius:8px;margin-bottom:14px}
+.sheetbar{background:var(--green);color:#fff;padding:6px 12px;font-size:13px;font-weight:600}
+table.sheet{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+.sheet th,.sheet td{border:1px solid #d6dfda;padding:6px 10px;white-space:nowrap}
+.sheet th{background:#f0f3f1;color:#6a7a72;font-weight:600;font-size:12px;text-align:center}
+.sheet th.rn{width:34px}
+.sheet td.hd{background:#e9f3ed;font-weight:700}
+.sheet td.num{text-align:right;font-variant-numeric:tabular-nums}
+.sheet td.txt{position:relative;text-align:left}
+.sheet td.txt::before{content:"";position:absolute;left:0;top:0;border:5px solid transparent;border-top-color:#1e9e57;border-left-color:#1e9e57}
+.sheet td.err{color:var(--red);font-weight:700;text-align:center}
+.sheet td.fx{font-family:ui-monospace,Consolas,monospace}
+.qtext{font-size:18px;margin:4px 0 0}
+.opts{display:grid;gap:10px;margin-top:14px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;width:100%;padding:12px 14px;border:2px solid var(--line);background:#fff;border-radius:12px;font:inherit;font-size:16px;cursor:pointer;transition:.12s;color:var(--ink)}
+.opt:hover:not(:disabled){border-color:var(--green);transform:translateY(-1px)}
+.opt .k{flex:none;width:30px;height:30px;border-radius:8px;background:var(--green-l);color:var(--green-d);display:grid;place-items:center;font-weight:700}
+.opt.ok{border-color:var(--green);background:var(--green-l)}
+.opt.bad{border-color:var(--red);background:var(--red-l)}
+.opt:disabled{cursor:default}
+.fb{margin-top:14px;padding:14px;border-radius:12px;border:2px solid;text-align:center}
+.fb.ok{background:var(--green-l);border-color:var(--green)}
+.fb.bad{background:var(--red-l);border-color:var(--red)}
+.fb p{margin:8px 0;text-align:left}
+.shake{animation:shake .4s}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.stat3{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:12px 0}
+.stat3 div{background:#f4f8f6;border:1px solid var(--line);border-radius:12px;padding:10px 16px;min-width:100px}
+.stat3 b{display:block;font-size:24px}
+#confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+.cf{position:absolute;top:-20px;width:10px;height:14px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.dialog{background:#10241a;color:#9ff0c0;font-family:ui-monospace,Consolas,monospace;border-radius:12px;padding:14px;text-align:left;margin:12px auto;max-width:560px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:520px){.big{font-size:52px}.qtext{font-size:17px}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><b>📊 Planilha Premiada</b><span>SENAI Afonso Pena · TGDQ</span></div>
+  <button id="mute" title="Ligar/desligar som" aria-label="Ligar ou desligar o som">🔊</button>
+</div>
+<div id="view"></div>
+<div id="confetti"></div>
+<noscript><p style="padding:20px">Ative o JavaScript do navegador para jogar.</p></noscript>
+
+<script>
+'use strict';
+/* ======================= utilidades ======================= */
+const $ = s => document.querySelector(s);
+const view = $('#view');
+const R = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const rnd1 = x => Math.round(x * 10) / 10;
+const rnd2 = x => Math.round(x * 100) / 100;
+const num = x => x.toLocaleString('pt-BR', { maximumFractionDigits: 4 });
+const money = n => 'R$ ' + n.toLocaleString('pt-BR', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 });
+const pct = n => n.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%';
+
+/* monta as 4 alternativas (a primeira é a correta; as outras são erros comuns, sem repetição) */
+function opts(c, wrongs, fmt) {
+  const ct = fmt(c), seen = new Set([ct]), out = [];
+  for (const w of wrongs) {
+    if (!isFinite(w) || w < 0) continue;
+    const t = fmt(w);
+    if (!seen.has(t)) { seen.add(t); out.push(t); }
+    if (out.length === 3) break;
+  }
+  const step = Math.max(1, Math.round(Math.abs(c) * 0.1));
+  let k = 1;
+  while (out.length < 3) {
+    const t = fmt(c + step * k);
+    if (!seen.has(t)) { seen.add(t); out.push(t); }
+    k++;
+  }
+  return { options: [ct, ...out], correct: ct };
+}
+
+/* ======================= som e confete ======================= */
+let muted = false, ac;
+function beep(freqs, dur = 0.12) {
+  if (muted) return;
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    const t = ac.currentTime;
+    freqs.forEach((f, i) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'square'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.05, t + i * dur);
+      g.gain.exponentialRampToValueAtTime(0.001, t + (i + 1) * dur);
+      o.connect(g); g.connect(ac.destination);
+      o.start(t + i * dur); o.stop(t + (i + 1) * dur);
+    });
+  } catch (e) { /* sem áudio: tudo bem */ }
+}
+const SFX = { ok: [660, 880], bad: [220, 160], promo: [523, 659, 784, 1047], win: [523, 659, 784, 1047, 1319], lose: [300, 250, 200, 150] };
+const sfx = k => beep(SFX[k]);
+$('#mute').onclick = () => { muted = !muted; $('#mute').textContent = muted ? '🔇' : '🔊'; };
+
+function confetti() {
+  const box = $('#confetti'), cols = ['#217346', '#f2b705', '#e74c3c', '#3498db', '#9b59b6'];
+  for (let i = 0; i < 60; i++) {
+    const s = document.createElement('span');
+    s.className = 'cf';
+    s.style.left = Math.random() * 100 + 'vw';
+    s.style.background = cols[i % cols.length];
+    s.style.animationDuration = (2 + Math.random() * 2) + 's';
+    s.style.animationDelay = Math.random() * 0.6 + 's';
+    box.appendChild(s);
+  }
+  setTimeout(() => { box.innerHTML = ''; }, 5000);
+}
+
+/* ======================= dados do jogo ======================= */
+const CARGOS = [
+  ['Estagiário de Planilhas', '📎'], ['Assistente de Dados', '🗂️'], ['Analista Júnior', '📈'],
+  ['Analista Pleno', '🧮'], ['Analista Sênior', '🧠'], ['Gerente de Dados', '💼'], ['Diretor de Análise', '👑']
+];
+const NEED = [200, 300, 400, 500, 600];   // XP para sair de cada cargo (Gerente -> Diretor é decidido pelo chefão)
+const BOSS = 'AUDITRON 3000';
+const EMPRESA = 'Grupo Vértice';
+const tierFor = c => (c < 2 ? 1 : c < 4 ? 2 : 3);
+
+/* ======================= banco de perguntas: erros de planilha ======================= */
+const STATIC = [
+  /* ---- nível 1 (fácil) ---- */
+  { id: 'e1', tier: 1, grid: { rows: [['Produto', 'Qtd', 'Preço unit.', 'Total'], ['Caneta', '10', 'R$ 2,50', 'R$ 25,00'], ['Caderno', '5', 'R$ 12,00', 'R$ 60,00'], ['Grampeador', '3', 'R$ 15,00', 'R$ 55,00']] },
+    q: 'Cada <b>Total</b> deveria ser Qtd × Preço unitário. Qual produto está com o total errado?',
+    o: ['Grampeador', 'Caneta', 'Caderno', 'Todos estão corretos'],
+    exp: '3 × R$ 15,00 = R$ 45,00, e não R$ 55,00. Sempre confira o resultado das multiplicações.' },
+  { id: 'e2', tier: 1, grid: { rows: [['Produto', 'Vendas', 'Meta', '% atingido'], ['Notebook', 'R$ 5.000', 'R$ 0', '#DIV/0!']] },
+    q: 'A célula D2 mostra <b>#DIV/0!</b>. O que esse erro significa?',
+    o: ['Houve uma divisão por zero', 'O nome da função está escrito errado', 'A referência da célula foi apagada', 'Existe texto onde deveria haver número'],
+    exp: 'A fórmula divide as vendas pela meta, e a meta é R$ 0. Divisão por zero gera #DIV/0!.' },
+  { id: 'e3', tier: 1, grid: { rows: [['Vendedor', 'Jan', 'Fev', 'Mar', 'Total'], ['Ana', '100', '150', '200', '450'], ['Bruno', '80', '120', '100', '400'], ['Carla', '90', '90', '90', '270']] },
+    q: 'A coluna <b>Total</b> deveria somar Jan + Fev + Mar. Qual vendedor está com o total errado?',
+    o: ['Bruno', 'Ana', 'Carla', 'Nenhum, todos estão certos'],
+    exp: '80 + 120 + 100 = 300, e não 400. As somas de Ana (450) e Carla (270) estão corretas.' },
+  { id: 'e4', tier: 1, grid: { rows: [['ID', 'Cliente', 'Cidade'], ['101', 'Maria Silva', 'Curitiba'], ['102', 'João Souza', 'Pinhais'], ['103', 'Maria Silva', 'Curitiba'], ['104', 'Ana Lima', 'Araucária']] },
+    q: 'Que problema de qualidade de dados aparece nesta lista de clientes?',
+    o: ['Registro duplicado (Maria Silva aparece duas vezes)', 'Referência circular', 'Data em formato inválido', 'Célula mesclada'],
+    exp: 'O mesmo cliente foi cadastrado duas vezes. Isso distorce contagens e totais. No Excel, use "Remover Duplicatas".' },
+  { id: 'e5', tier: 1, grid: { rows: [['Mês', 'Vendas'], ['Jan', '100'], ['Fev', '200'], ['Mar', "'300"], ['Total', '300']] },
+    q: 'A fórmula <b>=SOMA(B2:B4)</b> deveria dar 600, mas mostra 300. Qual a causa mais provável?',
+    o: ['O valor de março está como texto (alinhado à esquerda) e a soma o ignora', 'A função SOMA só soma duas células', 'Falta fechar o parêntese da fórmula', 'O Excel não soma meses seguidos'],
+    exp: 'O 300 de março é texto (note o triângulo verde e o alinhamento à esquerda). A função SOMA ignora textos.' },
+  { id: 'e6', tier: 1, grid: { rows: [['Pedido', 'Data'], ['001', '15/03/2026'], ['002', '31/02/2026'], ['003', '10/04/2026'], ['004', '05/05/2026']] },
+    q: 'Uma das datas abaixo é impossível. Qual?',
+    o: ['31/02/2026', '15/03/2026', '10/04/2026', '05/05/2026'],
+    exp: 'Fevereiro não tem dia 31. Validar datas evita erros em relatórios por período.' },
+
+  /* ---- nível 2 (médio) ---- */
+  { id: 'm1', tier: 2, grid: { rows: [['Mês', 'Vendas'], ['Jan', '100'], ['Fev', '200'], ['Mar', '150'], ['Abr', '250'], ['Mai', '300'], ['Total', '700']] },
+    q: 'O total em B7 usa <b>=SOMA(B2:B5)</b> e mostra 700, mas o correto é 1.000. Qual é o erro?',
+    o: ['O intervalo termina em B5 e deixou maio (B6) de fora', 'A função SOMA está escrita errado', 'Faltou incluir o cabeçalho B1', 'O total deveria usar MÉDIA'],
+    exp: 'O intervalo certo seria B2:B6. Ao inserir linhas novas, sempre revise o intervalo das fórmulas.' },
+  { id: 'm2', tier: 2, grid: { rows: [['Taxa', '5%', ''], ['Vendedor', 'Vendas', 'Comissão'], ['Ana', 'R$ 2.000', 'R$ 100'], ['Bruno', 'R$ 3.000', '#VALOR!']] },
+    q: 'Em C3 foi digitado <b>=B3*B1</b> e a fórmula foi arrastada até C4. Bruno ficou com erro. Qual fórmula, digitada em C3, resolve ao arrastar?',
+    o: ['=B3*$B$1', '=B3*B$2', '=$B3*B1', '=B3*B1*100'],
+    exp: 'Ao arrastar, B1 vira B2 (um texto). Com o cifrão ($B$1), a referência fica fixa na taxa. Isso é referência absoluta.' },
+  { id: 'm3', tier: 2, grid: { rows: [['Mês', 'Vendas'], ['Jan', '100'], ['Fev', '200'], ['Mar', '300'], ['Total', '600'], ['Média', '300']] },
+    q: 'A média em B6 usa <b>=MÉDIA(B2:B5)</b> e mostra 300, mas deveria ser 200. Por quê?',
+    o: ['O intervalo inclui a linha Total (600), que não é uma venda mensal', 'MÉDIA só funciona com dois valores', 'Faltou multiplicar por 3', 'O valor de janeiro deveria ser maior'],
+    exp: 'A média correta é (100 + 200 + 300) ÷ 3 = 200. Incluir o Total no intervalo infla o resultado.' },
+  { id: 'm4', tier: 2, grid: { rows: [['Produto', 'Vendas', 'Participação'], ['Notebook', 'R$ 50', '2500%'], ['Total', 'R$ 200', '']] },
+    q: 'Em C2 foi digitado <b>=B2/B3*100</b> e a célula está no formato porcentagem (%). O resultado é 2500%, mas deveria ser 25%. Qual o erro?',
+    o: ['Multiplicou por 100 e o formato % multiplica por 100 de novo', 'O total deveria ser R$ 500', 'A divisão deveria ser B3/B2', 'Falta o símbolo % dentro da fórmula'],
+    exp: 'Com o formato %, basta fazer =B2/B3 (0,25 aparece como 25%). Multiplicar por 100 também gera o valor duplicado.' },
+  { id: 'm5', tier: 2, grid: { rows: [['Produto', 'Categoria', 'Valor'], ['Mouse', 'Eletrônicos', 'R$ 80'], ['Teclado', 'Eletronicos', 'R$ 120'], ['Monitor', 'Eletrônicos', 'R$ 900']] },
+    q: 'Ao filtrar a categoria "Eletrônicos", o Teclado não aparece. Por quê?',
+    o: ['Foi digitado "Eletronicos" sem acento, então vale como outra categoria', 'O filtro esconde valores baixos', 'O filtro só mostra a primeira e a última linha', 'Categorias não podem ter acento no Excel'],
+    exp: 'Pequenas diferenças de digitação criam categorias diferentes. Padronize os dados (ou use lista suspensa) para filtrar bem.' },
+  { id: 'm6', tier: 2, grid: { rows: [['Mês', 'Vendas'], ['Jan', '100'], ['Fev', '200'], ['Total', '0']] },
+    q: 'Na célula B4 (Total) foi digitado <b>=SOMA(B2:B4)</b>. O Excel avisa sobre <b>referência circular</b> e mostra 0. O que está errado?',
+    o: ['A fórmula está dentro do próprio intervalo que soma (B4 inclui B4)', 'Faltam meses para somar', 'O Excel não permite fórmulas na última linha', 'SOMA exige ponto e vírgula entre cada célula'],
+    exp: 'A célula não pode somar a si mesma. O certo é =SOMA(B2:B3).' },
+
+  /* ---- nível 3 (difícil) ---- */
+  { id: 'h1', tier: 3, grid: { rows: [['Região', 'Vendas', '% do total'], ['Sul', 'R$ 400', '40%'], ['Sudeste', 'R$ 350', '35%'], ['Norte', 'R$ 150', '15%'], ['Nordeste', 'R$ 100', '20%'], ['Total', 'R$ 1.000', '']] },
+    q: 'O total de vendas é R$ 1.000. Qual região está com a porcentagem calculada de forma errada?',
+    o: ['Nordeste', 'Sul', 'Sudeste', 'Norte'],
+    exp: 'R$ 100 ÷ R$ 1.000 = 10%, e não 20%. Dica: a soma das participações deve fechar 100% (aqui fecha 110%).' },
+  { id: 'h2', tier: 3, grid: { rows: [['Mês', 'Vendas', 'Crescimento'], ['Janeiro', 'R$ 200', '—'], ['Fevereiro', 'R$ 250', '20%']] },
+    q: 'O crescimento de fevereiro foi calculado com <b>=(B3-B2)/B3</b> e deu 20%, mas deveria ser 25%. Qual o erro?',
+    o: ['Dividiu pelo valor novo (fevereiro); a base deve ser o valor antigo (janeiro)', 'Deveria somar B2 e B3 antes de dividir', 'A fórmula não deveria ter parênteses', 'Faltou multiplicar por 12 meses'],
+    exp: 'Crescimento = (novo − antigo) ÷ antigo = (250 − 200) ÷ 200 = 25%.' },
+  { id: 'h3', tier: 3, grid: { rows: [['Código', 'Preço'], ['103', 'R$ 30'], ['101', 'R$ 10'], ['105', 'R$ 50'], ['102', 'R$ 20'], ['104', 'R$ 40']] },
+    q: 'A fórmula <b>=PROCV(105;A2:B6;2;VERDADEIRO)</b> devolveu o preço errado, pois os códigos não estão em ordem. Qual a correção?',
+    o: ['Trocar VERDADEIRO por FALSO (busca exata)', 'Trocar o 2 por 1', 'Trocar A2:B6 por A2', 'Digitar o preço manualmente em todas as linhas'],
+    exp: 'VERDADEIRO faz busca aproximada, que exige a tabela ordenada. Com FALSO, o PROCV procura exatamente o código 105.' },
+  { id: 'h4', tier: 3, grid: { rows: [['Vendedor', 'Meta', 'Vendido', '% atingido'], ['Ana', 'R$ 50.000', 'R$ 40.000', '125%']] },
+    q: 'Ana vendeu R$ 40.000 para uma meta de R$ 50.000, mas D2 mostra 125%. Qual o erro na fórmula?',
+    o: ['Está invertida: dividiu a meta pelo vendido (B2/C2) em vez de vendido pela meta (C2/B2)', 'Falta somar meta e vendido', 'A meta deveria ser R$ 40.000', 'O formato percentual deveria ser removido'],
+    exp: 'O certo é vendido ÷ meta = 40.000 ÷ 50.000 = 80%.' },
+  { id: 'h5', tier: 3, grid: { rows: [['Produto', 'Vendas', '% (exibido)'], ['A', 'R$ 100', '33%'], ['B', 'R$ 100', '33%'], ['C', 'R$ 100', '33%']] },
+    q: 'Um colega somou os percentuais exibidos e achou 99%. Qual a explicação correta?',
+    o: ['Cada valor real é 33,333...%; a exibição está arredondada e a soma real é 100%', 'Falta um produto D com 1%', 'A fórmula de porcentagem está errada em todas as linhas', 'O Excel sempre perde 1% ao somar percentuais'],
+    exp: 'O formato só esconde as casas decimais. O valor guardado na célula é 33,333...%, e a soma real fecha 100%.' },
+  { id: 'h6', tier: 3, grid: { rows: [['Vendas', 'Líquido'], ['R$ 200', '#REF!']] },
+    q: 'A coluna Líquido tinha <b>=A2-B2</b>, mas depois que alguém excluiu a coluna B apareceu <b>#REF!</b>. O que esse erro significa?',
+    o: ['A fórmula aponta para uma célula ou coluna que foi excluída', 'Houve divisão por zero', 'O nome da função está errado', 'Há texto no lugar de número'],
+    exp: '#REF! indica referência inválida. Antes de excluir linhas ou colunas, verifique se alguma fórmula depende delas.' }
+];
+
+/* ======================= banco de perguntas: porcentagem de vendas (números aleatórios) ======================= */
+function pShare() {
+  const T = R([200, 400, 500, 1000]), p = R([10, 20, 25, 40, 50]), V = T * p / 100, item = R(['Notebook', 'Impressora', 'Cadeira', 'Monitor', 'Mouse']);
+  const o = opts(p, [p + 10, 100 - p, Math.round(T / V * 100), p * 2], pct);
+  return { tier: 1, grid: { rows: [['Item', 'Vendas'], [item, money(V)], ['Total da loja', money(T)]] },
+    q: `O produto <b>${item}</b> vendeu ${money(V)} de um total de ${money(T)}. Qual a participação dele no total de vendas?`, ...o,
+    exp: `Participação = parte ÷ total × 100 → ${money(V)} ÷ ${money(T)} × 100 = ${pct(p)}.` };
+}
+function pPercentOf() {
+  const p = R([10, 20, 25, 50]), V = R([200, 400, 800, 1200]), a = V * p / 100;
+  const o = opts(a, [V * p, V / p, V - a, V + a], money);
+  return { tier: 1, q: `Quanto é <b>${p}%</b> de <b>${money(V)}</b>?`, ...o,
+    exp: `${p}% de ${money(V)} = ${money(V)} × ${p} ÷ 100 = ${money(a)}.` };
+}
+function pGoal() {
+  const M = R([1000, 2000, 5000, 8000]), c = R([50, 60, 80, 90, 120]), V = M * c / 100;
+  const o = opts(c, [c + 10, c - 10, Math.round(M / V * 100), 100 - c], pct);
+  return { tier: 1, grid: { rows: [['Meta', 'Vendido', '% atingido'], [money(M), money(V), '?']] },
+    q: `A meta de vendas do mês era ${money(M)} e foram vendidos ${money(V)}. Que porcentagem da meta foi atingida?`, ...o,
+    exp: `% da meta = vendido ÷ meta × 100 = ${money(V)} ÷ ${money(M)} × 100 = ${pct(c)}.` };
+}
+function pDiscount() {
+  const P = R([100, 200, 400, 500]), d = R([10, 20, 25, 50]), desc = P * d / 100, F = P - desc;
+  const o = opts(F, [desc, P + desc, P - d, P * d], money);
+  return { tier: 1, q: `Uma mochila custa <b>${money(P)}</b> e está com <b>${d}% de desconto</b>. Qual o preço final?`, ...o,
+    exp: `Desconto = ${money(P)} × ${d} ÷ 100 = ${money(desc)}. Preço final = ${money(P)} − ${money(desc)} = ${money(F)}.` };
+}
+function pGrowth() {
+  const A = R([200, 400, 500, 800]), g = R([10, 20, 25, 50]), B = A * (1 + g / 100);
+  const o = opts(g, [rnd1((B - A) / B * 100), 100 + g, g + 10, g / 2], pct);
+  return { tier: 2, grid: { rows: [['Mês', 'Vendas'], ['Janeiro', money(A)], ['Fevereiro', money(B)]] },
+    q: `As vendas foram de ${money(A)} em janeiro e ${money(B)} em fevereiro. Qual foi o crescimento percentual?`, ...o,
+    exp: `Crescimento = (novo − antigo) ÷ antigo × 100 = (${money(B)} − ${money(A)}) ÷ ${money(A)} × 100 = ${pct(g)}.` };
+}
+function pCommission() {
+  const S = R([1500, 2000]), V = R([10000, 20000, 50000]), c = R([2, 3, 5]), com = V * c / 100, T = S + com;
+  const o = opts(T, [com, S + c, S + V * c / 10, S + V * c / 1000], money);
+  return { tier: 2, q: `Um vendedor recebe <b>salário fixo de ${money(S)}</b> mais <b>${c}% de comissão</b> sobre as vendas. Neste mês vendeu ${money(V)}. Quanto recebe no total?`, ...o,
+    exp: `Comissão = ${money(V)} × ${c} ÷ 100 = ${money(com)}. Total = ${money(S)} + ${money(com)} = ${money(T)}.` };
+}
+function pDrop() {
+  const A = R([500, 800, 1000, 2000]), d = R([10, 20, 25, 40]), B = A * (1 - d / 100);
+  const o = opts(d, [rnd1((A - B) / B * 100), 100 - d, d + 5, d * 2], pct);
+  return { tier: 2, grid: { rows: [['Mês', 'Vendas'], ['Janeiro', money(A)], ['Fevereiro', money(B)]] },
+    q: `As vendas caíram de ${money(A)} em janeiro para ${money(B)} em fevereiro. Qual foi a queda percentual?`, ...o,
+    exp: `Queda = (antigo − novo) ÷ antigo × 100 = (${money(A)} − ${money(B)}) ÷ ${money(A)} × 100 = ${pct(d)}.` };
+}
+function pSeller() {
+  const vals = R([[200, 300, 500], [100, 150, 250], [40, 60, 100], [250, 250, 500]]);
+  const names = shuffle(['Ana', 'Bruno', 'Carla']), i = Math.floor(Math.random() * 3);
+  const total = vals.reduce((a, b) => a + b, 0), shares = vals.map(v => v / total * 100), c = shares[i];
+  const wr = shares.filter((_, j) => j !== i).concat([c + 10, c - 10]);
+  const o = opts(c, wr, pct);
+  return { tier: 2, grid: { rows: [['Vendedor', 'Vendas'], ...names.map((n, j) => [n, money(vals[j])]), ['Total', money(total)]] },
+    q: `Qual a participação de <b>${names[i]}</b> nas vendas totais da equipe?`, ...o,
+    exp: `${names[i]}: ${money(vals[i])} ÷ ${money(total)} × 100 = ${pct(c)}.` };
+}
+function pUpDown() {
+  const P = R([100, 200, 400, 800]), a = R([10, 20, 25]);
+  const mid = rnd2(P * (1 + a / 100)), F = rnd2(P * (1 + a / 100) * (1 - a / 100));
+  const o = opts(F, [P, rnd2(P * (1 + a * a / 10000)), rnd2(P * (1 - a / 100)), rnd2(P * (1 + a / 100))], money);
+  return { tier: 3, q: `Um produto de <b>${money(P)}</b> sofreu aumento de <b>${a}%</b> e, na semana seguinte, desconto de <b>${a}%</b> sobre o novo preço. Qual o preço final?`, ...o,
+    exp: `Após o aumento: ${money(P)} × ${num(1 + a / 100)} = ${money(mid)}. O desconto incide sobre esse valor: ${money(mid)} × ${num(1 - a / 100)} = ${money(F)}. Aumento e desconto iguais não se anulam.` };
+}
+function pOverGoal() {
+  const M = R([5000, 8000, 10000]), c = R([110, 120, 125, 150]), V = M * c / 100;
+  const o = opts(V, [V - M, M + c, M * c, rnd2(M / (c / 100))], money);
+  return { tier: 3, q: `A meta de Ana era <b>${money(M)}</b> e ela atingiu <b>${c}%</b> dela. Quanto ela vendeu?`, ...o,
+    exp: `Vendido = ${money(M)} × ${c} ÷ 100 = ${money(V)}. Passar de 100% significa vender mais que a meta.` };
+}
+function pMargin() {
+  const P = R([100, 200, 500]), m = R([20, 25, 40, 50]), C = P * (1 - m / 100), L = P - C;
+  const o = opts(m, [rnd1(L / C * 100), 100 - m, m / 2, m + 10], pct);
+  return { tier: 3, grid: { rows: [['Custo', 'Venda', 'Lucro'], [money(C), money(P), money(L)]] },
+    q: `Uma mercadoria custou ${money(C)} e é vendida por ${money(P)}. Qual a <b>margem de lucro sobre o preço de venda</b>?`, ...o,
+    exp: `Lucro = ${money(P)} − ${money(C)} = ${money(L)}. Margem = lucro ÷ preço de venda × 100 = ${money(L)} ÷ ${money(P)} × 100 = ${pct(m)}.` };
+}
+function pPctOfPct() {
+  const a = R([40, 50, 60, 80]), b = R([25, 50, 20]), c = a * b / 100;
+  const o = opts(c, [a + b, Math.abs(a - b), b, a], pct);
+  return { tier: 3, q: `Em uma campanha, <b>${a}%</b> dos clientes compraram, e <b>${b}%</b> dessas compras foram parceladas. Que porcentagem do total de clientes fez compra parcelada?`, ...o,
+    exp: `${b}% de ${a}% = ${a} × ${b} ÷ 100 = ${pct(c)} dos clientes.` };
+}
+const PROC = { 1: [pShare, pPercentOf, pGoal, pDiscount], 2: [pGrowth, pCommission, pDrop, pSeller], 3: [pUpDown, pOverGoal, pMargin, pPctOfPct] };
+
+let used = new Set(), lastTpl = null;
+function pickQuestion(tier) {
+  const pool = STATIC.filter(s => s.tier === tier && !used.has(s.id));
+  if (pool.length && Math.random() < 0.55) {
+    const s = R(pool); used.add(s.id);
+    return { tier, grid: s.grid, q: s.q, options: s.o.slice(), correct: s.o[0], exp: s.exp };
+  }
+  let fn;
+  do { fn = R(PROC[tier]); } while (fn === lastTpl && PROC[tier].length > 1);
+  lastTpl = fn;
+  return fn();
+}
+
+/* ======================= desenho da planilha ======================= */
+function gridHTML(g) {
+  const rows = g.rows, cols = Math.max(...rows.map(r => r.length));
+  const L = i => String.fromCharCode(65 + i);
+  let h = `<div class="sheetwrap"><div class="sheetbar">📗 Relatorio_${EMPRESA.replace(/\s/g, '')}.xlsx</div><table class="sheet"><tr><th class="rn"></th>`;
+  for (let c = 0; c < cols; c++) h += `<th>${L(c)}</th>`;
+  h += '</tr>';
+  rows.forEach((r, ri) => {
+    h += `<tr><th class="rn">${ri + 1}</th>`;
+    for (let c = 0; c < cols; c++) {
+      let v = r[c] == null ? '' : String(r[c]); const cls = [];
+      if (ri === 0) cls.push('hd');
+      if (v.startsWith("'")) { cls.push('txt'); v = v.slice(1); }
+      else if (v.startsWith('#')) cls.push('err');
+      else if (v.startsWith('=')) cls.push('fx');
+      else if (ri > 0 && /^(R\$\s?)?-?[\d.,]+%?$/.test(v)) cls.push('num');
+      h += `<td class="${cls.join(' ')}">${v}</td>`;
+    }
+    h += '</tr>';
+  });
+  return h + '</table></div>';
+}
+
+/* ======================= estado e telas ======================= */
+let S = {};
+function newGame() {
+  used = new Set(); lastTpl = null;
+  S = { phase: 1, cargo: 0, xp: 0, lives: 2, score: 0, correct: 0, wrong: 0, q: null, answered: true, after: null, boss: null };
+}
+
+function showStart() {
+  S = {};
+  view.innerHTML = `<div class="wrap"><div class="card hero">
+    <div class="big pop">📊</div>
+    <h1>Planilha Premiada</h1>
+    <p class="mut">Jogo educacional de dados administrativos · SENAI Afonso Pena · TGDQ</p>
+    <p>Você acaba de ser contratado como <b>analista de dados iniciante</b> no <b>${EMPRESA}</b>. Seu cargo é um dos mais baixos da empresa, e sua missão é provar que merece crescer. Resolva desafios de <b>erros em planilhas</b> e <b>porcentagem de vendas</b>, suba de cargo e, no final, enfrente o chefe: uma <b>inteligência artificial</b>.</p>
+    <ol class="how">
+      <li>Cada resposta certa vale <b>100 pontos</b> e <b>100 XP</b>.</li>
+      <li>Junte XP para ser promovido: Estagiário → Assistente → Júnior → Pleno → Sênior → <b>Gerente de Dados</b> (200, 300, 400, 500 e 600 XP).</li>
+      <li>Você tem <b>2 vidas</b> por cargo. Errou, perde uma. Sem vidas, você volta ao cargo de Estagiário.</li>
+      <li>Como Gerente, enfrente o <b>${BOSS}</b>: acerte <b>5 perguntas</b> antes do <b>3º erro</b> (no máximo 7 perguntas) e conquiste o cargo de <b>Diretor de Análise</b>.</li>
+    </ol>
+    <button class="btn" id="go">▶ Começar carreira</button>
+    <p class="credits">Integrantes: Kael Oliveira Delgado · Zaquel Pereira Monteiro · Natã Cidral</p>
+  </div></div>`;
+  $('#go').onclick = () => { newGame(); nextQ(); };
+}
+
+function hudData() {
+  if (S.phase === 1) {
+    const need = NEED[S.cargo], nxt = CARGOS[S.cargo + 1][0];
+    return {
+      h1: `${CARGOS[S.cargo][1]} ${CARGOS[S.cargo][0]}`, h2: `⭐ ${S.score} pts`,
+      h3: `${'❤️'.repeat(S.lives)}${'🖤'.repeat(2 - S.lives)} Vidas`,
+      h4: `XP ${S.xp}/${need}`, h5: `Próximo cargo: ${nxt}`, bar: Math.min(100, S.xp / need * 100),
+      lad: CARGOS.map((c, i) => `<span class="${i < S.cargo ? 'done' : i === S.cargo ? 'cur' : i === 6 ? 'goal' : ''}" title="${c[0]}"></span>`).join('')
+    };
+  }
+  const b = S.boss;
+  return {
+    h1: `🤖 ${BOSS}`, h2: `⭐ ${S.score} pts`,
+    h3: `${'❤️'.repeat(Math.max(0, 2 - b.errors))}${'🖤'.repeat(Math.min(2, b.errors))} Erros ${b.errors}/2`,
+    h4: `Vida da IA: ${b.hp}%`, h5: `Pergunta ${b.asked} de 7`, bar: b.hp, lad: ''
+  };
+}
+function updateHud() {
+  const d = hudData();
+  $('#h1').textContent = d.h1; $('#h2').textContent = d.h2; $('#h3').textContent = d.h3;
+  $('#h4').textContent = d.h4; $('#h5').textContent = d.h5;
+  $('#hBar').style.width = d.bar + '%'; $('#hLad').innerHTML = d.lad;
+}
+
+function nextQ() { S.phase = 1; S.q = pickQuestion(tierFor(S.cargo)); renderPlay(); }
+function nextBossQ() { S.boss.asked++; S.q = pickQuestion(3); renderPlay(); }
+
+function renderPlay() {
+  const q = S.q; q.shuf = shuffle(q.options); S.answered = false;
+  view.innerHTML = `<div class="wrap">
+    <div class="card hud ${S.phase === 2 ? 'boss' : ''}">
+      <div class="stats"><span class="pill" id="h1"></span><span class="pill" id="h2"></span><span class="pill" id="h3"></span></div>
+      <div class="xprow"><span id="h4"></span><span id="h5"></span></div>
+      <div class="bar"><i id="hBar"></i></div><div class="ladder" id="hLad"></div>
+    </div>
+    <div class="card" id="qcard">${q.grid ? gridHTML(q.grid) : ''}
+      <p class="qtext">${q.q}</p>
+      <div class="opts">${q.shuf.map((o, i) => `<button class="opt" data-i="${i}"><span class="k">${'ABCD'[i]}</span><span>${o}</span></button>`).join('')}</div>
+      <div id="fb" aria-live="polite"></div>
+    </div></div>`;
+  view.querySelectorAll('.opt').forEach(b => { b.onclick = () => answer(+b.dataset.i); });
+  updateHud();
+  window.scrollTo({ top: 0 });
+}
+
+function answer(i) {
+  if (S.answered) return;
+  S.answered = true;
+  const q = S.q, ok = q.shuf[i] === q.correct;
+  view.querySelectorAll('.opt').forEach((b, j) => {
+    b.disabled = true;
+    if (q.shuf[j] === q.correct) b.classList.add('ok'); else if (j === i) b.classList.add('bad');
+  });
+  let msg, label = 'Próxima pergunta ➜', after;
+  if (S.phase === 1) {
+    if (ok) {
+      S.score += 100; S.xp += 100; S.correct++; sfx('ok');
+      msg = '✅ <b>Correto!</b> +100 pontos e +100 XP.';
+      if (S.xp >= NEED[S.cargo]) { label = '🎉 Ver promoção'; after = promote; } else after = nextQ;
+    } else {
+      S.lives--; S.wrong++; sfx('bad'); $('#qcard').classList.add('shake');
+      msg = '❌ <b>Não foi dessa vez.</b> Você perdeu 1 vida.';
+      if (S.lives <= 0) { label = 'Continuar'; after = showFired; } else after = nextQ;
+    }
+  } else {
+    const b = S.boss;
+    if (ok) {
+      b.hits++; b.hp = Math.max(0, 100 - b.hits * 20); S.score += 100; S.correct++; sfx('ok');
+      msg = `✅ <b>Acertou!</b> O ${BOSS} sofreu 20% de dano.`;
+      if (b.hits >= 5) { label = '🏆 Ver resultado'; after = showWin; } else after = nextBossQ;
+    } else {
+      b.errors++; S.wrong++; sfx('bad'); $('#qcard').classList.add('shake');
+      msg = `❌ <b>Errou!</b> ${b.errors > 2 ? 'Esse foi o terceiro erro.' : `Você já cometeu ${b.errors} de 2 erros permitidos. O próximo erro é fatal.`}`;
+      if (b.errors > 2) { label = 'Continuar'; after = showLose; } else after = nextBossQ;
+    }
+  }
+  updateHud();
+  $('#fb').innerHTML = `<div class="fb ${ok ? 'ok' : 'bad'}">${msg}
+    ${ok ? '' : `<p>Resposta certa: <b>${q.correct}</b></p>`}<p>💡 ${q.exp}</p>
+    <button class="btn" id="nx">${label}</button></div>`;
+  const nx = $('#nx'); nx.onclick = after; nx.focus({ preventScroll: true });
+  nx.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+function promote() {
+  S.cargo++; S.xp = 0; S.lives = 2; sfx('promo'); confetti();
+  const last = S.cargo === 5, [n, e] = CARGOS[S.cargo];
+  view.innerHTML = `<div class="wrap"><div class="card hero">
+    <div class="big pop">${e}</div><h2>PROMOÇÃO!</h2>
+    <p>Você agora é <b>${n}</b>.</p>
+    <p class="mut">${last
+      ? `Você conquistou todas as promoções. Só falta o cargo de <b>Diretor de Análise</b>, e quem guarda essa cadeira é o <b>${BOSS}</b>, a IA que controla os relatórios do ${EMPRESA}.`
+      : `Próxima meta: ${NEED[S.cargo]} de XP para virar ${CARGOS[S.cargo + 1][0]}. Suas vidas foram restauradas.`}</p>
+    <button class="btn" id="go">${last ? '🚪 Entrar na sala do chefe' : 'Continuar ➜'}</button></div></div>`;
+  $('#go').onclick = last ? showBossIntro : nextQ;
+}
+
+function showBossIntro() {
+  view.innerHTML = `<div class="wrap"><div class="card hero">
+    <div class="big pop">🤖</div><h2>A sala do chefe</h2>
+    <div class="dialog">&gt; ${BOSS} ONLINE<br>&gt; Analista detectado.<br>&gt; Seus relatórios serão auditados.<br>&gt; Errar três vezes significa desligamento.</div>
+    <ol class="how">
+      <li>A batalha tem até <b>7 perguntas</b> sobre erros em planilhas e porcentagens.</li>
+      <li>Cada acerto causa <b>20% de dano</b> na IA. Com <b>5 acertos</b>, ela é derrotada.</li>
+      <li>Você pode errar <b>no máximo 2 vezes</b>. No <b>3º erro</b>, é Game Over.</li>
+    </ol>
+    <button class="btn" id="go">⚔️ Iniciar batalha</button></div></div>`;
+  $('#go').onclick = startBoss;
+}
+function startBoss() { S.phase = 2; S.boss = { hp: 100, errors: 0, asked: 0, hits: 0 }; nextBossQ(); }
+
+function showFired() {
+  sfx('lose');
+  view.innerHTML = `<div class="wrap"><div class="card hero">
+    <div class="big pop">📉</div><h2>Fim das vidas!</h2>
+    <p>Os erros se acumularam e você perdeu a vaga de <b>${CARGOS[S.cargo][0]}</b>. Sua carreira volta ao começo.</p>
+    <p class="mut">Você retorna ao cargo de <b>${CARGOS[0][0]}</b>, com o XP zerado. Seus pontos ficam. Dá para tentar de novo!</p>
+    <button class="btn" id="go">↩ Recomeçar como ${CARGOS[0][0]}</button></div></div>`;
+  $('#go').onclick = () => { S.cargo = 0; S.xp = 0; S.lives = 2; nextQ(); };
+}
+
+function showLose() {
+  sfx('lose');
+  view.innerHTML = `<div class="wrap"><div class="card hero">
+    <div class="big pop">💀</div><h2>GAME OVER</h2>
+    <div class="dialog">&gt; ${BOSS}: três falhas registradas.<br>&gt; Relatório reprovado.<br>&gt; Estude os erros e volte para a auditoria.</div>
+    <p class="mut">Você acertou ${S.boss.hits} de 5 acertos necessários.</p>
+    <button class="btn" id="again">⚔️ Tentar a batalha de novo</button>
+    <button class="btn alt" id="restart">Recomeçar carreira</button></div></div>`;
+  $('#again').onclick = startBoss;
+  $('#restart').onclick = () => { newGame(); nextQ(); };
+}
+
+function showWin() {
+  S.cargo = 6; sfx('win'); confetti();
+  view.innerHTML = `<div class="wrap"><div class="card hero">
+    <div class="big pop">👑</div><h1>PARABÉNS!</h1>
+    <p>Você derrotou o <b>${BOSS}</b> e conquistou o cargo máximo do ${EMPRESA}: <b>Diretor de Análise</b>.</p>
+    <p class="mut">De estagiário a diretor, usando dados com atenção e responsabilidade. Excelente trabalho!</p>
+    <div class="stat3"><div><b>${S.score}</b>pontos</div><div><b>${S.correct}</b>acertos</div><div><b>${S.wrong}</b>erros</div></div>
+    <button class="btn" id="go">🔁 Jogar novamente</button>
+    <p class="credits">Criado por Kael Oliveira Delgado, Zaquel Pereira Monteiro e Natã Cidral<br>SENAI Afonso Pena · Assistente Administrativo · TGDQ</p>
+  </div></div>`;
+  $('#go').onclick = showStart;
+}
+
+/* atalhos de teclado: A–D ou 1–4 escolhem a alternativa */
+document.addEventListener('keydown', e => {
+  if (!S || !S.q || S.answered || !view.querySelector('.opt')) return;
+  const k = 'abcd1234'.indexOf(e.key.toLowerCase());
+  if (k >= 0) answer(k % 4);
+});
+
+showStart();
+</script>
+</body>
+</html>
