@@ -1,1071 +1,1067 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Planilha Premiada — SENAI Afonso Pena · TGDQ</title>
-<!-- Tailwind CSS via CDN -->
-<script src="https://cdn.tailwindcss.com"></script>
-<!-- QRCode.js para gerar QR Codes no projetor -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<!-- PeerJS para conexões P2P sem banco de dados -->
-<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Planilha Premiada</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
-  body {
-    font-family: 'Inter', sans-serif;
-    background-color: #0d1b14;
-    color: #e2e8f0;
-  }
-  .excel-grid table {
-    border-collapse: collapse;
-    width: 100%;
-    font-size: 14px;
-    background: #ffffff;
-    color: #1e293b;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .excel-grid th, .excel-grid td {
-    border: 1px solid #cbd5e1;
-    padding: 6px 12px;
-  }
-  .excel-grid th {
-    background: #f1f5f9;
-    color: #475569;
-    font-weight: 700;
-    text-align: center;
-    font-size: 12px;
-  }
-  .excel-grid td.num { text-align: right; font-variant-numeric: tabular-nums; }
-  .excel-grid td.err { color: #dc2626; font-weight: 800; text-align: center; }
-  .excel-grid td.fx { font-family: monospace; font-weight: 600; color: #166534; }
-  .pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-  @keyframes pop {
-    0% { transform: scale(0.9); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  .cf {
-    position: fixed;
-    top: -20px;
-    width: 10px;
-    height: 14px;
-    z-index: 999;
-    pointer-events: none;
-    animation: fall linear forwards;
-  }
-  @keyframes fall {
-    to { transform: translateY(105vh) rotate(720deg); }
-  }
+:root{--green:#217346;--green-d:#185a36;--green-l:#e3f1ea;--bg:#eef3f0;--ink:#1d2b24;--mut:#5b6b63;--line:#cfd9d3;--red:#c0392b;--red-l:#fbe9e7;--gold:#f2b705;--card:#fff}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--green)}
+.topbar{background:var(--green);color:#fff;display:flex;align-items:center;justify-content:space-between;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));position:sticky;top:env(safe-area-inset-top,0px);z-index:11}
+.brand{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;font-size:18px}
+.brand span{font-size:12px;opacity:.85}
+.topbar button{background:rgba(255,255,255,.18);border:0;color:#fff;border-radius:8px;padding:6px 10px;font-size:18px;cursor:pointer}
+.wrap{max-width:860px;margin:0 auto;padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:14px}
+.wrap>*{min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 2px 0 rgba(0,0,0,.04)}
+.hero{text-align:center;padding:28px 18px}
+.hero h1,.hero h2{margin:.2em 0}
+.big{font-size:64px;line-height:1}
+.mut{color:var(--mut)}
+.pop{animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.btn{background:var(--green);color:#fff;border:0;border-radius:12px;padding:13px 22px;font:inherit;font-weight:700;font-size:17px;cursor:pointer;box-shadow:0 4px 0 var(--green-d);margin:6px}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--green-d)}
+.btn.alt{background:#fff;color:var(--green-d);border:2px solid var(--green);box-shadow:none}
+.how{text-align:left;max-width:560px;margin:14px auto;padding-left:20px}
+.how li{margin:6px 0}
+.credits{font-size:13px;color:var(--mut);margin-top:14px}
+.stats{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.pill{background:#f4f8f6;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-weight:600;font-size:14px}
+.xprow{display:flex;justify-content:space-between;font-size:13px;color:var(--mut);margin:10px 0 4px}
+.bar{height:14px;background:#dfe8e3;border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),#4cb782);transition:width .6s}
+.boss .bar>i{background:linear-gradient(90deg,#c0392b,#e67e22)}
+.ladder{display:flex;gap:4px;margin-top:10px}
+.ladder span{flex:1;height:8px;border-radius:4px;background:#dfe8e3}
+.ladder .done{background:var(--green)}
+.ladder .cur{background:var(--gold)}
+.ladder .goal{background:repeating-linear-gradient(45deg,#dfe8e3,#dfe8e3 4px,#f3d778 4px,#f3d778 8px)}
+.sheetwrap{overflow-x:auto;border:1px solid #b9c7bf;border-radius:8px;margin-bottom:14px}
+.sheetbar{background:var(--green);color:#fff;padding:6px 12px;font-size:13px;font-weight:600}
+table.sheet{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+.sheet th,.sheet td{border:1px solid #d6dfda;padding:6px 10px;white-space:nowrap}
+.sheet th{background:#f0f3f1;color:#6a7a72;font-weight:600;font-size:12px;text-align:center}
+.sheet th.rn{width:34px}
+.sheet td.hd{background:#e9f3ed;font-weight:700}
+.sheet td.num{text-align:right;font-variant-numeric:tabular-nums}
+.sheet td.txt{position:relative;text-align:left}
+.sheet td.txt::before{content:"";position:absolute;left:0;top:0;border:5px solid transparent;border-top-color:#1e9e57;border-left-color:#1e9e57}
+.sheet td.err{color:var(--red);font-weight:700;text-align:center}
+.sheet td.fx{font-family:ui-monospace,Consolas,monospace}
+.qrimg{background:#fff;padding:10px;border-radius:12px;border:1px solid var(--line);width:200px;height:200px;margin:10px auto}.qrimg svg{width:100%;height:100%;display:block}#qrlink{word-break:break-all;font-size:12px}
+.qtext{font-size:18px;margin:4px 0 0}
+.opts{display:grid;gap:10px;margin-top:14px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;width:100%;padding:12px 14px;border:2px solid var(--line);background:#fff;border-radius:12px;font:inherit;font-size:16px;cursor:pointer;transition:.12s;color:var(--ink)}
+.opt:hover:not(:disabled){border-color:var(--green);transform:translateY(-1px)}
+.opt .k{flex:none;width:30px;height:30px;border-radius:8px;background:var(--green-l);color:var(--green-d);display:grid;place-items:center;font-weight:700}
+.opt.ok{border-color:var(--green);background:var(--green-l)}
+.opt.bad{border-color:var(--red);background:var(--red-l)}
+.opt:disabled{cursor:default}
+.fb{margin-top:14px;padding:14px;border-radius:12px;border:2px solid;text-align:center}
+.fb.ok{background:var(--green-l);border-color:var(--green)}
+.fb.bad{background:var(--red-l);border-color:var(--red)}
+.fb p{margin:8px 0;text-align:left}
+.shake{animation:shake .4s}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.stat3{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:12px 0}
+.stat3 div{background:#f4f8f6;border:1px solid var(--line);border-radius:12px;padding:10px 16px;min-width:100px}
+.stat3 b{display:block;font-size:24px}
+#confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+.cf{position:absolute;top:-20px;width:10px;height:14px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.dialog{background:#10241a;color:#9ff0c0;font-family:ui-monospace,Consolas,monospace;border-radius:12px;padding:14px;text-align:left;margin:12px auto;max-width:560px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:520px){.big{font-size:52px}.qtext{font-size:17px}}
+
+/* ---------- modo Kahoot ---------- */
+.wrap.wide{max-width:1100px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.tile{display:flex;align-items:center;gap:12px;min-height:84px;min-width:0;padding:12px 14px;border:0;border-radius:12px;color:#fff;font:inherit;font-weight:700;font-size:17px;text-align:left;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+button.tile{cursor:pointer;width:100%}
+button.tile:active:not(:disabled){transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+button.tile:disabled{cursor:default}
+.tile .shp{flex:none;width:34px;text-align:center;font-size:26px}
+.tile .tx{min-width:0;overflow-wrap:anywhere}
+.tile .cn{flex:none;margin-left:auto;background:rgba(0,0,0,.3);border-radius:999px;padding:2px 12px;font-size:18px;color:#fff}
+.t0{background:#e21b3c}.t1{background:#1368ce}.t2{background:#d89e00;color:#1d1d1d}.t3{background:#26890c}
+.tile.dim{opacity:.3;box-shadow:none}
+.tile.pick{outline:4px solid var(--ink);outline-offset:2px}
+.tile.right{outline:4px solid var(--ink);outline-offset:2px}
+.wide .qtext{font-size:24px}
+.wide .tile{min-height:96px;font-size:21px}
+.pinbox{background:#10241a;color:#9ff0c0;font-family:ui-monospace,Consolas,monospace;font-size:clamp(44px,12vw,96px);line-height:1.1;letter-spacing:.14em;padding:14px 10px;border-radius:14px;margin:12px 0;text-align:center}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0;min-height:34px}
+.chip{background:var(--green-l);color:var(--green-d);border-radius:999px;padding:6px 14px;font-weight:700;overflow-wrap:anywhere}
+.tmr{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+.warn{background:var(--red-l);border:1px solid var(--red);color:var(--red);border-radius:10px;padding:8px 12px;font-weight:600;text-align:center}
+.jform{display:grid;gap:8px;max-width:360px;margin:14px auto;text-align:left}
+.jform label{font-weight:700;font-size:14px}
+.jform input,.jform select{font:inherit;font-size:20px;padding:12px;border:2px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);width:100%}
+.jform input:focus,.jform select:focus{outline:3px solid var(--green);outline-offset:1px}
+.jerr{min-height:1.4em;color:var(--red);font-weight:600}
+.bd{display:grid;gap:6px;text-align:left;margin-top:10px}
+.bd .r{display:flex;align-items:center;gap:10px;background:#f4f8f6;border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.bd .r.me{background:var(--green-l);border-color:var(--green)}
+.bd .p{flex:none;width:34px;font-weight:800;font-variant-numeric:tabular-nums}
+.bd .n{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:700}
+.bd .d{color:var(--green-d);font-weight:700;font-size:13px}
+.bd b{font-variant-numeric:tabular-nums}
+.pod{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:18px 0 8px}
+.pod .col{flex:1;min-width:0;max-width:200px;text-align:center}
+.pod .pn{font-weight:800;overflow-wrap:anywhere}
+.pod .ps{font-size:14px;color:var(--mut);margin-bottom:4px;font-variant-numeric:tabular-nums}
+.pod .blk{display:grid;place-items:center;border-radius:10px 10px 0 0;color:#10241a;font-size:28px;font-weight:800}
+@media (max-width:520px){.tiles{grid-template-columns:1fr}.wide .qtext{font-size:19px}.wide .tile{min-height:84px;font-size:17px}}
 </style>
-</head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+<div class="topbar">
+  <div class="brand"><b>📊 Planilha Premiada</b><span>SENAI Afonso Pena · TGDQ</span></div>
+  <button id="mute" title="Ligar/desligar som" aria-label="Ligar ou desligar o som">🔊</button>
+</div>
+<div id="view"></div>
+<div id="confetti"></div>
+<noscript><p style="padding:20px">Ative o JavaScript do navegador para jogar.</p></noscript>
 
-<!-- TOP BAR -->
-<header class="bg-emerald-800 border-b border-emerald-700 px-4 py-3 flex justify-between items-center shadow-lg">
-  <div class="flex items-center gap-3">
-    <span class="text-2xl">📊</span>
-    <div>
-      <h1 class="font-extrabold text-white text-base md:text-lg leading-none">Planilha Premiada</h1>
-      <span class="text-emerald-200 text-xs">SENAI Afonso Pena · TGDQ</span>
-    </div>
-  </div>
-  <button id="muteBtn" onclick="toggleMute()" class="bg-emerald-900/60 hover:bg-emerald-900 text-white p-2 rounded-xl border border-emerald-600 text-sm flex items-center gap-1.5 transition">
-    <span id="muteIcon">🔊</span> <span class="hidden sm:inline text-xs font-bold">Som</span>
-  </button>
-</header>
-
-<!-- ÁREA PRINCIPAL DA TELA -->
-<main id="app" class="flex-grow flex items-center justify-center p-4">
-  <!-- Conteúdo renderizado dinamicamente via JS -->
-</main>
-
-<!-- FOOTER -->
-<footer class="text-center py-3 text-xs text-slate-500 border-t border-slate-800">
-  Desenvolvido por Kael Oliveira Delgado · Zaquel Pereira Monteiro · Natã Cidral — TGDQ
-</footer>
-
-<div id="confettiContainer"></div>
-
+<script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script>
 'use strict';
+/* ======================= utilidades ======================= */
+const $ = s => document.querySelector(s);
+const view = $('#view');
+const R = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const rnd1 = x => Math.round(x * 10) / 10;
+const rnd2 = x => Math.round(x * 100) / 100;
+const num = x => x.toLocaleString('pt-BR', { maximumFractionDigits: 4 });
+const money = n => 'R$ ' + n.toLocaleString('pt-BR', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 });
+const pct = n => n.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%';
 
-/* ==========================================================================
-   1. ESTADO GLOBAL DA APLICAÇÃO
-   ========================================================================== */
-let state = {
-  mode: null,          // 'HOST', 'PLAYER', 'LOCAL'
-  roomCode: null,
-  peer: null,
-  channel: null,
-  usingFallback: false,
-  playersList: {},     // Para o HOST armazenar os alunos
-  hostConn: null,      // Para o JOGADOR comunicar com o HOST
-  playerName: '',
-  questions: [],
-  currentQIndex: 0,
-  timer: 25,
-  timerId: null,
-  gameState: 'LOBBY',  // 'LOBBY', 'QUESTION', 'RESULT', 'GAMEOVER'
-  playerScore: 0,
-  streak: 0
-};
-
-let muted = false;
-let audioCtx = null;
-
-function toggleMute() {
-  muted = !muted;
-  document.getElementById('muteIcon').textContent = muted ? '🔇' : '🔊';
+/* monta as 4 alternativas (a primeira é a correta; as outras são erros comuns, sem repetição) */
+function opts(c, wrongs, fmt) {
+  const ct = fmt(c), seen = new Set([ct]), out = [];
+  for (const w of wrongs) {
+    if (!isFinite(w) || w < 0) continue;
+    const t = fmt(w);
+    if (!seen.has(t)) { seen.add(t); out.push(t); }
+    if (out.length === 3) break;
+  }
+  const step = Math.max(1, Math.round(Math.abs(c) * 0.1));
+  let k = 1;
+  while (out.length < 3) {
+    const t = fmt(c + step * k);
+    if (!seen.has(t)) { seen.add(t); out.push(t); }
+    k++;
+  }
+  return { options: [ct, ...out], correct: ct };
 }
 
-function sfx(type) {
+/* ======================= som e confete ======================= */
+let muted = false, ac;
+function beep(freqs, dur = 0.12) {
   if (muted) return;
   try {
-    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-    const t = audioCtx.currentTime;
-    const freqs = {
-      ok: [523, 659, 784],
-      bad: [220, 165],
-      tick: [800],
-      win: [523, 659, 784, 1047]
-    }[type] || [440];
-
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    const t = ac.currentTime;
     freqs.forEach((f, i) => {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = f;
-      gain.gain.setValueAtTime(0.05, t + i * 0.1);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + (i + 1) * 0.1);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(t + i * 0.1);
-      osc.stop(t + (i + 1) * 0.1);
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'square'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.05, t + i * dur);
+      g.gain.exponentialRampToValueAtTime(0.001, t + (i + 1) * dur);
+      o.connect(g); g.connect(ac.destination);
+      o.start(t + i * dur); o.stop(t + (i + 1) * dur);
     });
-  } catch(e) {}
+  } catch (e) { /* sem áudio: tudo bem */ }
 }
+const SFX = { ok: [660, 880], bad: [220, 160], promo: [523, 659, 784, 1047], win: [523, 659, 784, 1047, 1319], lose: [300, 250, 200, 150] };
+const sfx = k => beep(SFX[k]);
+$('#mute').onclick = () => { muted = !muted; $('#mute').textContent = muted ? '🔇' : '🔊'; };
 
-function triggerConfetti() {
-  const box = document.getElementById('confettiContainer');
-  const cols = ['#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6'];
-  for (let i = 0; i < 50; i++) {
+function confetti() {
+  const box = $('#confetti'), cols = ['#217346', '#f2b705', '#e74c3c', '#3498db', '#9b59b6'];
+  for (let i = 0; i < 60; i++) {
     const s = document.createElement('span');
     s.className = 'cf';
     s.style.left = Math.random() * 100 + 'vw';
     s.style.background = cols[i % cols.length];
     s.style.animationDuration = (2 + Math.random() * 2) + 's';
-    s.style.animationDelay = Math.random() * 0.5 + 's';
+    s.style.animationDelay = Math.random() * 0.6 + 's';
     box.appendChild(s);
   }
-  setTimeout(() => { box.innerHTML = ''; }, 4500);
+  setTimeout(() => { box.innerHTML = ''; }, 5000);
 }
 
-const $ = s => document.querySelector(s);
-function setScreen(html) { $('#app').innerHTML = html; }
-
-/* ==========================================================================
-   2. QUESTÕES DO JOGO E CARGOS
-   ========================================================================== */
+/* ======================= dados do jogo ======================= */
 const CARGOS = [
-  { name: 'Estagiário de Planilhas', icon: '📎', min: 0 },
-  { name: 'Assistente de Dados', icon: '🗂️', min: 300 },
-  { name: 'Analista Júnior', icon: '📈', min: 700 },
-  { name: 'Analista Pleno', icon: '🧮', min: 1200 },
-  { name: 'Analista Sênior', icon: '🧠', min: 1800 },
-  { name: 'Gerente de Dados', icon: '💼', min: 2500 },
-  { name: 'Diretor de Análise', icon: '👑', min: 3500 }
+  ['Estagiário de Planilhas', '📎'], ['Assistente de Dados', '🗂️'], ['Analista Júnior', '📈'],
+  ['Analista Pleno', '🧮'], ['Analista Sênior', '🧠'], ['Gerente de Dados', '💼'], ['Diretor de Análise', '👑']
+];
+const NEED = [200, 300, 400, 500, 600];   // XP para sair de cada cargo (Gerente -> Diretor é decidido pelo chefão)
+const BOSS = 'AUDITRON 3000';
+const EMPRESA = 'Grupo Vértice';
+const tierFor = c => (c < 2 ? 1 : c < 4 ? 2 : 3);
+
+/* ======================= banco de perguntas: erros de planilha ======================= */
+const STATIC = [
+  /* ---- nível 1 (fácil) ---- */
+  { id: 'e1', tier: 1, grid: { rows: [['Produto', 'Qtd', 'Preço unit.', 'Total'], ['Caneta', '10', 'R$ 2,50', 'R$ 25,00'], ['Caderno', '5', 'R$ 12,00', 'R$ 60,00'], ['Grampeador', '3', 'R$ 15,00', 'R$ 55,00']] },
+    q: 'Cada <b>Total</b> deveria ser Qtd × Preço unitário. Qual produto está com o total errado?',
+    o: ['Grampeador', 'Caneta', 'Caderno', 'Todos estão corretos'],
+    exp: '3 × R$ 15,00 = R$ 45,00, e não R$ 55,00. Sempre confira o resultado das multiplicações.' },
+  { id: 'e2', tier: 1, grid: { rows: [['Produto', 'Vendas', 'Meta', '% atingido'], ['Notebook', 'R$ 5.000', 'R$ 0', '#DIV/0!']] },
+    q: 'A célula D2 mostra <b>#DIV/0!</b>. O que esse erro significa?',
+    o: ['Houve uma divisão por zero', 'O nome da função está escrito errado', 'A referência da célula foi apagada', 'Existe texto onde deveria haver número'],
+    exp: 'A fórmula divide as vendas pela meta, e a meta é R$ 0. Divisão por zero gera #DIV/0!.' },
+  { id: 'e3', tier: 1, grid: { rows: [['Vendedor', 'Jan', 'Fev', 'Mar', 'Total'], ['Ana', '100', '150', '200', '450'], ['Bruno', '80', '120', '100', '400'], ['Carla', '90', '90', '90', '270']] },
+    q: 'A coluna <b>Total</b> deveria somar Jan + Fev + Mar. Qual vendedor está com o total errado?',
+    o: ['Bruno', 'Ana', 'Carla', 'Nenhum, todos estão certos'],
+    exp: '80 + 120 + 100 = 300, e não 400. As somas de Ana (450) e Carla (270) estão corretas.' },
+  { id: 'e4', tier: 1, grid: { rows: [['ID', 'Cliente', 'Cidade'], ['101', 'Maria Silva', 'Curitiba'], ['102', 'João Souza', 'Pinhais'], ['103', 'Maria Silva', 'Curitiba'], ['104', 'Ana Lima', 'Araucária']] },
+    q: 'Que problema de qualidade de dados aparece nesta lista de clientes?',
+    o: ['Registro duplicado (Maria Silva aparece duas vezes)', 'Referência circular', 'Data em formato inválido', 'Célula mesclada'],
+    exp: 'O mesmo cliente foi cadastrado duas vezes. Isso distorce contagens e totais. No Excel, use "Remover Duplicatas".' },
+  { id: 'e5', tier: 1, grid: { rows: [['Mês', 'Vendas'], ['Jan', '100'], ['Fev', '200'], ['Mar', "'300"], ['Total', '300']] },
+    q: 'A fórmula <b>=SOMA(B2:B4)</b> deveria dar 600, mas mostra 300. Qual a causa mais provável?',
+    o: ['O valor de março está como texto (alinhado à esquerda) e a soma o ignora', 'A função SOMA só soma duas células', 'Falta fechar o parêntese da fórmula', 'O Excel não soma meses seguidos'],
+    exp: 'O 300 de março é texto (note o triângulo verde e o alinhamento à esquerda). A função SOMA ignora textos.' },
+  { id: 'e6', tier: 1, grid: { rows: [['Pedido', 'Data'], ['001', '15/03/2026'], ['002', '31/02/2026'], ['003', '10/04/2026'], ['004', '05/05/2026']] },
+    q: 'Uma das datas abaixo é impossível. Qual?',
+    o: ['31/02/2026', '15/03/2026', '10/04/2026', '05/05/2026'],
+    exp: 'Fevereiro não tem dia 31. Validar datas evita erros em relatórios por período.' },
+
+  /* ---- nível 2 (médio) ---- */
+  { id: 'm1', tier: 2, grid: { rows: [['Mês', 'Vendas'], ['Jan', '100'], ['Fev', '200'], ['Mar', '150'], ['Abr', '250'], ['Mai', '300'], ['Total', '700']] },
+    q: 'O total em B7 usa <b>=SOMA(B2:B5)</b> e mostra 700, mas o correto é 1.000. Qual é o erro?',
+    o: ['O intervalo termina em B5 e deixou maio (B6) de fora', 'A função SOMA está escrita errado', 'Faltou incluir o cabeçalho B1', 'O total deveria usar MÉDIA'],
+    exp: 'O intervalo certo seria B2:B6. Ao inserir linhas novas, sempre revise o intervalo das fórmulas.' },
+  { id: 'm2', tier: 2, grid: { rows: [['Taxa', '5%', ''], ['Vendedor', 'Vendas', 'Comissão'], ['Ana', 'R$ 2.000', 'R$ 100'], ['Bruno', 'R$ 3.000', '#VALOR!']] },
+    q: 'Em C3 foi digitado <b>=B3*B1</b> e a fórmula foi arrastada até C4. Bruno ficou com erro. Qual fórmula, digitada em C3, resolve ao arrastar?',
+    o: ['=B3*$B$1', '=B3*B$2', '=$B3*B1', '=B3*B1*100'],
+    exp: 'Ao arrastar, B1 vira B2 (um texto). Com o cifrão ($B$1), a referência fica fixa na taxa. Isso é referência absoluta.' },
+  { id: 'm3', tier: 2, grid: { rows: [['Mês', 'Vendas'], ['Jan', '100'], ['Fev', '200'], ['Mar', '300'], ['Total', '600'], ['Média', '300']] },
+    q: 'A média em B6 usa <b>=MÉDIA(B2:B5)</b> e mostra 300, mas deveria ser 200. Por quê?',
+    o: ['O intervalo inclui a linha Total (600), que não é uma venda mensal', 'MÉDIA só funciona com dois valores', 'Faltou multiplicar por 3', 'O valor de janeiro deveria ser maior'],
+    exp: 'A média correta é (100 + 200 + 300) ÷ 3 = 200. Incluir o Total no intervalo infla o resultado.' },
+  { id: 'm4', tier: 2, grid: { rows: [['Produto', 'Vendas', 'Participação'], ['Notebook', 'R$ 50', '2500%'], ['Total', 'R$ 200', '']] },
+    q: 'Em C2 foi digitado <b>=B2/B3*100</b> e a célula está no formato porcentagem (%). O resultado é 2500%, mas deveria ser 25%. Qual o erro?',
+    o: ['Multiplicou por 100 e o formato % multiplica por 100 de novo', 'O total deveria ser R$ 500', 'A divisão deveria ser B3/B2', 'Falta o símbolo % dentro da fórmula'],
+    exp: 'Com o formato %, basta fazer =B2/B3 (0,25 aparece como 25%). Multiplicar por 100 também gera o valor duplicado.' },
+  { id: 'm5', tier: 2, grid: { rows: [['Produto', 'Categoria', 'Valor'], ['Mouse', 'Eletrônicos', 'R$ 80'], ['Teclado', 'Eletronicos', 'R$ 120'], ['Monitor', 'Eletrônicos', 'R$ 900']] },
+    q: 'Ao filtrar a categoria "Eletrônicos", o Teclado não aparece. Por quê?',
+    o: ['Foi digitado "Eletronicos" sem acento, então vale como outra categoria', 'O filtro esconde valores baixos', 'O filtro só mostra a primeira e a última linha', 'Categorias não podem ter acento no Excel'],
+    exp: 'Pequenas diferenças de digitação criam categorias diferentes. Padronize os dados (ou use lista suspensa) para filtrar bem.' },
+  { id: 'm6', tier: 2, grid: { rows: [['Mês', 'Vendas'], ['Jan', '100'], ['Fev', '200'], ['Total', '0']] },
+    q: 'Na célula B4 (Total) foi digitado <b>=SOMA(B2:B4)</b>. O Excel avisa sobre <b>referência circular</b> e mostra 0. O que está errado?',
+    o: ['A fórmula está dentro do próprio intervalo que soma (B4 inclui B4)', 'Faltam meses para somar', 'O Excel não permite fórmulas na última linha', 'SOMA exige ponto e vírgula entre cada célula'],
+    exp: 'A célula não pode somar a si mesma. O certo é =SOMA(B2:B3).' },
+
+  /* ---- nível 3 (difícil) ---- */
+  { id: 'h1', tier: 3, grid: { rows: [['Região', 'Vendas', '% do total'], ['Sul', 'R$ 400', '40%'], ['Sudeste', 'R$ 350', '35%'], ['Norte', 'R$ 150', '15%'], ['Nordeste', 'R$ 100', '20%'], ['Total', 'R$ 1.000', '']] },
+    q: 'O total de vendas é R$ 1.000. Qual região está com a porcentagem calculada de forma errada?',
+    o: ['Nordeste', 'Sul', 'Sudeste', 'Norte'],
+    exp: 'R$ 100 ÷ R$ 1.000 = 10%, e não 20%. Dica: a soma das participações deve fechar 100% (aqui fecha 110%).' },
+  { id: 'h2', tier: 3, grid: { rows: [['Mês', 'Vendas', 'Crescimento'], ['Janeiro', 'R$ 200', '—'], ['Fevereiro', 'R$ 250', '20%']] },
+    q: 'O crescimento de fevereiro foi calculado com <b>=(B3-B2)/B3</b> e deu 20%, mas deveria ser 25%. Qual o erro?',
+    o: ['Dividiu pelo valor novo (fevereiro); a base deve ser o valor antigo (janeiro)', 'Deveria somar B2 e B3 antes de dividir', 'A fórmula não deveria ter parênteses', 'Faltou multiplicar por 12 meses'],
+    exp: 'Crescimento = (novo − antigo) ÷ antigo = (250 − 200) ÷ 200 = 25%.' },
+  { id: 'h3', tier: 3, grid: { rows: [['Código', 'Preço'], ['103', 'R$ 30'], ['101', 'R$ 10'], ['105', 'R$ 50'], ['102', 'R$ 20'], ['104', 'R$ 40']] },
+    q: 'A fórmula <b>=PROCV(105;A2:B6;2;VERDADEIRO)</b> devolveu o preço errado, pois os códigos não estão em ordem. Qual a correção?',
+    o: ['Trocar VERDADEIRO por FALSO (busca exata)', 'Trocar o 2 por 1', 'Trocar A2:B6 por A2', 'Digitar o preço manualmente em todas as linhas'],
+    exp: 'VERDADEIRO faz busca aproximada, que exige a tabela ordenada. Com FALSO, o PROCV procura exatamente o código 105.' },
+  { id: 'h4', tier: 3, grid: { rows: [['Vendedor', 'Meta', 'Vendido', '% atingido'], ['Ana', 'R$ 50.000', 'R$ 40.000', '125%']] },
+    q: 'Ana vendeu R$ 40.000 para uma meta de R$ 50.000, mas D2 mostra 125%. Qual o erro na fórmula?',
+    o: ['Está invertida: dividiu a meta pelo vendido (B2/C2) em vez de vendido pela meta (C2/B2)', 'Falta somar meta e vendido', 'A meta deveria ser R$ 40.000', 'O formato percentual deveria ser removido'],
+    exp: 'O certo é vendido ÷ meta = 40.000 ÷ 50.000 = 80%.' },
+  { id: 'h5', tier: 3, grid: { rows: [['Produto', 'Vendas', '% (exibido)'], ['A', 'R$ 100', '33%'], ['B', 'R$ 100', '33%'], ['C', 'R$ 100', '33%']] },
+    q: 'Um colega somou os percentuais exibidos e achou 99%. Qual a explicação correta?',
+    o: ['Cada valor real é 33,333...%; a exibição está arredondada e a soma real é 100%', 'Falta um produto D com 1%', 'A fórmula de porcentagem está errada em todas as linhas', 'O Excel sempre perde 1% ao somar percentuais'],
+    exp: 'O formato só esconde as casas decimais. O valor guardado na célula é 33,333...%, e a soma real fecha 100%.' },
+  { id: 'h6', tier: 3, grid: { rows: [['Vendas', 'Líquido'], ['R$ 200', '#REF!']] },
+    q: 'A coluna Líquido tinha <b>=A2-B2</b>, mas depois que alguém excluiu a coluna B apareceu <b>#REF!</b>. O que esse erro significa?',
+    o: ['A fórmula aponta para uma célula ou coluna que foi excluída', 'Houve divisão por zero', 'O nome da função está errado', 'Há texto no lugar de número'],
+    exp: '#REF! indica referência inválida. Antes de excluir linhas ou colunas, verifique se alguma fórmula depende delas.' }
 ];
 
-function getCargo(score) {
-  let current = CARGOS[0];
-  for (const c of CARGOS) {
-    if (score >= c.min) current = c;
+/* ======================= banco de perguntas: porcentagem de vendas (números aleatórios) ======================= */
+function pShare() {
+  const T = R([200, 400, 500, 1000]), p = R([10, 20, 25, 40, 50]), V = T * p / 100, item = R(['Notebook', 'Impressora', 'Cadeira', 'Monitor', 'Mouse']);
+  const o = opts(p, [p + 10, 100 - p, Math.round(T / V * 100), p * 2], pct);
+  return { tier: 1, grid: { rows: [['Item', 'Vendas'], [item, money(V)], ['Total da loja', money(T)]] },
+    q: `O produto <b>${item}</b> vendeu ${money(V)} de um total de ${money(T)}. Qual a participação dele no total de vendas?`, ...o,
+    exp: `Participação = parte ÷ total × 100 → ${money(V)} ÷ ${money(T)} × 100 = ${pct(p)}.` };
+}
+function pPercentOf() {
+  const p = R([10, 20, 25, 50]), V = R([200, 400, 800, 1200]), a = V * p / 100;
+  const o = opts(a, [V * p, V / p, V - a, V + a], money);
+  return { tier: 1, q: `Quanto é <b>${p}%</b> de <b>${money(V)}</b>?`, ...o,
+    exp: `${p}% de ${money(V)} = ${money(V)} × ${p} ÷ 100 = ${money(a)}.` };
+}
+function pGoal() {
+  const M = R([1000, 2000, 5000, 8000]), c = R([50, 60, 80, 90, 120]), V = M * c / 100;
+  const o = opts(c, [c + 10, c - 10, Math.round(M / V * 100), 100 - c], pct);
+  return { tier: 1, grid: { rows: [['Meta', 'Vendido', '% atingido'], [money(M), money(V), '?']] },
+    q: `A meta de vendas do mês era ${money(M)} e foram vendidos ${money(V)}. Que porcentagem da meta foi atingida?`, ...o,
+    exp: `% da meta = vendido ÷ meta × 100 = ${money(V)} ÷ ${money(M)} × 100 = ${pct(c)}.` };
+}
+function pDiscount() {
+  const P = R([100, 200, 400, 500]), d = R([10, 20, 25, 50]), desc = P * d / 100, F = P - desc;
+  const o = opts(F, [desc, P + desc, P - d, P * d], money);
+  return { tier: 1, q: `Uma mochila custa <b>${money(P)}</b> e está com <b>${d}% de desconto</b>. Qual o preço final?`, ...o,
+    exp: `Desconto = ${money(P)} × ${d} ÷ 100 = ${money(desc)}. Preço final = ${money(P)} − ${money(desc)} = ${money(F)}.` };
+}
+function pGrowth() {
+  const A = R([200, 400, 500, 800]), g = R([10, 20, 25, 50]), B = A * (1 + g / 100);
+  const o = opts(g, [rnd1((B - A) / B * 100), 100 + g, g + 10, g / 2], pct);
+  return { tier: 2, grid: { rows: [['Mês', 'Vendas'], ['Janeiro', money(A)], ['Fevereiro', money(B)]] },
+    q: `As vendas foram de ${money(A)} em janeiro e ${money(B)} em fevereiro. Qual foi o crescimento percentual?`, ...o,
+    exp: `Crescimento = (novo − antigo) ÷ antigo × 100 = (${money(B)} − ${money(A)}) ÷ ${money(A)} × 100 = ${pct(g)}.` };
+}
+function pCommission() {
+  const S = R([1500, 2000]), V = R([10000, 20000, 50000]), c = R([2, 3, 5]), com = V * c / 100, T = S + com;
+  const o = opts(T, [com, S + c, S + V * c / 10, S + V * c / 1000], money);
+  return { tier: 2, q: `Um vendedor recebe <b>salário fixo de ${money(S)}</b> mais <b>${c}% de comissão</b> sobre as vendas. Neste mês vendeu ${money(V)}. Quanto recebe no total?`, ...o,
+    exp: `Comissão = ${money(V)} × ${c} ÷ 100 = ${money(com)}. Total = ${money(S)} + ${money(com)} = ${money(T)}.` };
+}
+function pDrop() {
+  const A = R([500, 800, 1000, 2000]), d = R([10, 20, 25, 40]), B = A * (1 - d / 100);
+  const o = opts(d, [rnd1((A - B) / B * 100), 100 - d, d + 5, d * 2], pct);
+  return { tier: 2, grid: { rows: [['Mês', 'Vendas'], ['Janeiro', money(A)], ['Fevereiro', money(B)]] },
+    q: `As vendas caíram de ${money(A)} em janeiro para ${money(B)} em fevereiro. Qual foi a queda percentual?`, ...o,
+    exp: `Queda = (antigo − novo) ÷ antigo × 100 = (${money(A)} − ${money(B)}) ÷ ${money(A)} × 100 = ${pct(d)}.` };
+}
+function pSeller() {
+  const vals = R([[200, 300, 500], [100, 150, 250], [40, 60, 100], [250, 250, 500]]);
+  const names = shuffle(['Ana', 'Bruno', 'Carla']), i = Math.floor(Math.random() * 3);
+  const total = vals.reduce((a, b) => a + b, 0), shares = vals.map(v => v / total * 100), c = shares[i];
+  const wr = shares.filter((_, j) => j !== i).concat([c + 10, c - 10]);
+  const o = opts(c, wr, pct);
+  return { tier: 2, grid: { rows: [['Vendedor', 'Vendas'], ...names.map((n, j) => [n, money(vals[j])]), ['Total', money(total)]] },
+    q: `Qual a participação de <b>${names[i]}</b> nas vendas totais da equipe?`, ...o,
+    exp: `${names[i]}: ${money(vals[i])} ÷ ${money(total)} × 100 = ${pct(c)}.` };
+}
+function pUpDown() {
+  const P = R([100, 200, 400, 800]), a = R([10, 20, 25]);
+  const mid = rnd2(P * (1 + a / 100)), F = rnd2(P * (1 + a / 100) * (1 - a / 100));
+  const o = opts(F, [P, rnd2(P * (1 + a * a / 10000)), rnd2(P * (1 - a / 100)), rnd2(P * (1 + a / 100))], money);
+  return { tier: 3, q: `Um produto de <b>${money(P)}</b> sofreu aumento de <b>${a}%</b> e, na semana seguinte, desconto de <b>${a}%</b> sobre o novo preço. Qual o preço final?`, ...o,
+    exp: `Após o aumento: ${money(P)} × ${num(1 + a / 100)} = ${money(mid)}. O desconto incide sobre esse valor: ${money(mid)} × ${num(1 - a / 100)} = ${money(F)}. Aumento e desconto iguais não se anulam.` };
+}
+function pOverGoal() {
+  const M = R([5000, 8000, 10000]), c = R([110, 120, 125, 150]), V = M * c / 100;
+  const o = opts(V, [V - M, M + c, M * c, rnd2(M / (c / 100))], money);
+  return { tier: 3, q: `A meta de Ana era <b>${money(M)}</b> e ela atingiu <b>${c}%</b> dela. Quanto ela vendeu?`, ...o,
+    exp: `Vendido = ${money(M)} × ${c} ÷ 100 = ${money(V)}. Passar de 100% significa vender mais que a meta.` };
+}
+function pMargin() {
+  const P = R([100, 200, 500]), m = R([20, 25, 40, 50]), C = P * (1 - m / 100), L = P - C;
+  const o = opts(m, [rnd1(L / C * 100), 100 - m, m / 2, m + 10], pct);
+  return { tier: 3, grid: { rows: [['Custo', 'Venda', 'Lucro'], [money(C), money(P), money(L)]] },
+    q: `Uma mercadoria custou ${money(C)} e é vendida por ${money(P)}. Qual a <b>margem de lucro sobre o preço de venda</b>?`, ...o,
+    exp: `Lucro = ${money(P)} − ${money(C)} = ${money(L)}. Margem = lucro ÷ preço de venda × 100 = ${money(L)} ÷ ${money(P)} × 100 = ${pct(m)}.` };
+}
+function pPctOfPct() {
+  const a = R([40, 50, 60, 80]), b = R([25, 50, 20]), c = a * b / 100;
+  const o = opts(c, [a + b, Math.abs(a - b), b, a], pct);
+  return { tier: 3, q: `Em uma campanha, <b>${a}%</b> dos clientes compraram, e <b>${b}%</b> dessas compras foram parceladas. Que porcentagem do total de clientes fez compra parcelada?`, ...o,
+    exp: `${b}% de ${a}% = ${a} × ${b} ÷ 100 = ${pct(c)} dos clientes.` };
+}
+const PROC = { 1: [pShare, pPercentOf, pGoal, pDiscount], 2: [pGrowth, pCommission, pDrop, pSeller], 3: [pUpDown, pOverGoal, pMargin, pPctOfPct] };
+
+let used = new Set(), lastTpl = null;
+function pickQuestion(tier) {
+  const pool = STATIC.filter(s => s.tier === tier && !used.has(s.id));
+  if (pool.length && Math.random() < 0.55) {
+    const s = R(pool); used.add(s.id);
+    return { tier, grid: s.grid, q: s.q, options: s.o.slice(), correct: s.o[0], exp: s.exp };
   }
-  return current;
+  let fn;
+  do { fn = R(PROC[tier]); } while (fn === lastTpl && PROC[tier].length > 1);
+  lastTpl = fn;
+  return fn();
 }
 
-const KAHOOT_COLORS = [
-  { bg: 'bg-red-600', hover: 'hover:bg-red-500', border: 'border-red-800', shape: '▲' },
-  { bg: 'bg-blue-600', hover: 'hover:bg-blue-500', border: 'border-blue-800', shape: '◆' },
-  { bg: 'bg-amber-500', hover: 'hover:bg-amber-400', border: 'border-amber-700', shape: '●' },
-  { bg: 'bg-emerald-600', hover: 'hover:bg-emerald-500', border: 'border-emerald-800', shape: '■' }
-];
-
-const STATIC_QUESTIONS = [
-  {
-    grid: { rows: [['Produto', 'Qtd', 'Preço unit.', 'Total'], ['Caneta', '10', 'R$ 2,50', 'R$ 25,00'], ['Caderno', '5', 'R$ 12,00', 'R$ 60,00'], ['Grampeador', '3', 'R$ 15,00', 'R$ 55,00']] },
-    q: 'Cada Total deveria ser Qtd × Preço unitário. Qual produto está com o total errado na tabela?',
-    options: ['Grampeador', 'Caneta', 'Caderno', 'Todos estão corretos'],
-    correctIndex: 0,
-    exp: '3 × R$ 15,00 = R$ 45,00, e não R$ 55,00.'
-  },
-  {
-    grid: { rows: [['Produto', 'Vendas', 'Meta', '% atingido'], ['Notebook', 'R$ 5.000', 'R$ 0', '#DIV/0!']] },
-    q: 'A célula D2 mostra o erro #DIV/0!. O que esse erro significa no Excel?',
-    options: ['Houve uma divisão por zero', 'O nome da função está errado', 'A célula foi apagada', 'Existe texto onde deveria haver número'],
-    correctIndex: 0,
-    exp: 'A fórmula tentou dividir as vendas pela meta (R$ 0). Divisão por zero resulta em #DIV/0!.'
-  },
-  {
-    grid: { rows: [['Mês', 'Vendas'], ['Jan', '100'], ['Fev', '200'], ['Mar', "'300"], ['Total', '300']] },
-    q: 'A fórmula =SOMA(B2:B4) deveria dar 600, mas mostra 300. Qual a causa?',
-    options: ['O valor de Março é texto (\'300) e a SOMA o ignora', 'A função SOMA só aceita 2 células', 'Falta fechar o parêntese da fórmula', 'O Excel não soma números ímpares'],
-    correctIndex: 0,
-    exp: 'O apóstrofo (\') torna o número um texto. A função SOMA ignora valores em formato de texto.'
-  },
-  {
-    grid: { rows: [['Taxa', '5%', ''], ['Vendedor', 'Vendas', 'Comissão'], ['Ana', 'R$ 2.000', 'R$ 100'], ['Bruno', 'R$ 3.000', '#VALOR!']] },
-    q: 'Ao arrastar a fórmula de comissão, Bruno ficou com erro. Que fórmula em C3 resolve isso ao arrastar?',
-    options: ['=B3*$B$1', '=B3*B$2', '=$B3*B1', '=B3*B1*100'],
-    correctIndex: 0,
-    exp: 'Com o cifrão ($B$1), a referência da taxa permanece fixa ao arrastar (referência absoluta).'
-  },
-  {
-    grid: { rows: [['Vendas', 'Líquido'], ['R$ 200', '#REF!']] },
-    q: 'A coluna tinha a fórmula =A2-B2, mas após excluir a coluna B apareceu #REF!. O que isso indica?',
-    options: ['A fórmula aponta para uma célula/coluna que foi apagada', 'Houve divisão por zero', 'Nome de função inválido', 'Erro de texto no valor'],
-    correctIndex: 0,
-    exp: '#REF! significa referência inválida de célula.'
-  }
-];
-
-function generateMathQuestion() {
-  const P = [100, 200, 400, 500][Math.floor(Math.random() * 4)];
-  const d = [10, 20, 25, 50][Math.floor(Math.random() * 4)];
-  const desc = P * d / 100;
-  const F = P - desc;
-  
-  return {
-    q: `Um produto custa R$ ${P},00 e recebeu ${d}% de desconto. Qual o preço final com desconto?`,
-    options: [`R$ ${F},00`, `R$ ${desc},00`, `R$ ${P + desc},00`, `R$ ${P - d},00`],
-    correctIndex: 0,
-    exp: `Desconto de ${d}% de R$ ${P} = R$ ${desc}. Preço final = R$ ${P} - R$ ${desc} = R$ ${F}.`
-  };
-}
-
-function getAllQuestions() {
-  const list = [...STATIC_QUESTIONS];
-  list.push(generateMathQuestion());
-  list.push(generateMathQuestion());
-  // Embaralha alternativas de cada questão
-  return list.map(q => {
-    const originalCorrect = q.options[q.correctIndex];
-    const shuffledOpts = [...q.options].sort(() => Math.random() - 0.5);
-    const newCorrectIdx = shuffledOpts.indexOf(originalCorrect);
-    return { ...q, options: shuffledOpts, correctIndex: newCorrectIdx };
-  });
-}
-
-function renderSheetGrid(g) {
-  const rows = g.rows;
-  const cols = Math.max(...rows.map(r => r.length));
+/* ======================= desenho da planilha ======================= */
+function gridHTML(g, safe) {
+  const rows = g.rows, cols = Math.max(...rows.map(r => r.length));
   const L = i => String.fromCharCode(65 + i);
-  let h = `<div class="excel-grid my-3 shadow-md rounded-lg overflow-hidden border border-slate-600"><table class="w-full"><tr><th class="w-8"></th>`;
+  let h = `<div class="sheetwrap"><div class="sheetbar">📗 Relatorio_${EMPRESA.replace(/\s/g, '')}.xlsx</div><table class="sheet"><tr><th class="rn"></th>`;
   for (let c = 0; c < cols; c++) h += `<th>${L(c)}</th>`;
   h += '</tr>';
   rows.forEach((r, ri) => {
-    h += `<tr><th class="text-slate-400 font-normal">${ri + 1}</th>`;
+    h += `<tr><th class="rn">${ri + 1}</th>`;
     for (let c = 0; c < cols; c++) {
-      let v = r[c] == null ? '' : String(r[c]);
-      let cls = '';
-      if (ri === 0) cls = 'font-bold bg-slate-100';
-      if (v.startsWith("'")) { v = v.slice(1); }
-      else if (v.startsWith('#')) cls += ' err';
-      else if (v.startsWith('=')) cls += ' fx';
-      else if (ri > 0 && /^(R\$\s?)?-?[\d.,]+%?$/.test(v)) cls += ' num';
-      h += `<td class="${cls}">${v}</td>`;
+      let v = r[c] == null ? '' : String(r[c]); const cls = [];
+      if (ri === 0) cls.push('hd');
+      if (v.startsWith("'")) { cls.push('txt'); v = v.slice(1); }
+      else if (v.startsWith('#')) cls.push('err');
+      else if (v.startsWith('=')) cls.push('fx');
+      else if (ri > 0 && /^(R\$\s?)?-?[\d.,]+%?$/.test(v)) cls.push('num');
+      h += `<td class="${cls.join(' ')}">${safe ? esc(v) : v}</td>`;
     }
     h += '</tr>';
   });
   return h + '</table></div>';
 }
 
-/* ==========================================================================
-   3. TELA INICIAL (MENU PRINCIPAL)
-   ========================================================================== */
-function renderStartScreen() {
-  state.mode = null;
-  setScreen(`
-    <div class="max-w-2xl w-full bg-slate-800/90 border border-slate-700 rounded-3xl p-6 md:p-10 shadow-2xl pop text-center">
-      <div class="text-6xl mb-3">📊</div>
-      <h2 class="text-3xl md:text-4xl font-black text-white tracking-tight">Planilha Premiada</h2>
-      <p class="text-emerald-400 font-semibold text-sm mt-1">Modo Multiplayer para Sala de Aula estilo Kahoot!</p>
-      
-      <p class="text-slate-300 text-sm mt-4 leading-relaxed max-w-lg mx-auto">
-        Aprenda a identificar <b>erros de planilhas Excel</b> e <b>cálculos de porcentagem</b>. Suba de cargo administrativo de Estagiário até Diretor de Análise!
-      </p>
-
-      <!-- BOTÕES DE MODO DE JOGO -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-8 text-left">
-        <!-- MODO PROFESSOR -->
-        <button onclick="setupHostMode()" class="bg-gradient-to-br from-emerald-600 to-emerald-800 hover:from-emerald-500 hover:to-emerald-700 border border-emerald-500 p-5 rounded-2xl shadow-xl transition active:scale-95 group">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-3xl">📺</span>
-            <span class="bg-emerald-950 text-emerald-300 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full border border-emerald-500/40">Modo Professor</span>
-          </div>
-          <h3 class="text-white font-black text-lg group-hover:text-emerald-200">Criar Sala (Projetor)</h3>
-          <p class="text-emerald-100/70 text-xs mt-1">Gera o código da sala e exibe as perguntas e o placar na tela principal.</p>
-        </button>
-
-        <!-- MODO ALUNO -->
-        <button onclick="setupPlayerMode()" class="bg-gradient-to-br from-blue-600 to-indigo-800 hover:from-blue-500 hover:to-indigo-700 border border-blue-500 p-5 rounded-2xl shadow-xl transition active:scale-95 group">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-3xl">📱</span>
-            <span class="bg-blue-950 text-blue-300 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full border border-blue-500/40">Modo Aluno</span>
-          </div>
-          <h3 class="text-white font-black text-lg group-hover:text-blue-200">Entrar na Sala (Celular)</h3>
-          <p class="text-blue-100/70 text-xs mt-1">Entre com o código de 4 dígitos para responder pelo smartphone.</p>
-        </button>
-      </div>
-
-      <!-- MODO SOLO / LOCAL -->
-      <div class="border-t border-slate-700/80 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <span class="text-xs text-slate-400">Quer treinar sozinho neste dispositivo?</span>
-        <button onclick="setupLocalMode()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold text-xs py-2.5 px-4 rounded-xl transition border border-slate-600">
-          🎮 Jogar Modo Solo
-        </button>
-      </div>
-    </div>
-  `);
+/* ======================= estado e telas ======================= */
+let S = {};
+function newGame() {
+  used = new Set(); lastTpl = null;
+  S = { phase: 1, cargo: 0, xp: 0, lives: 2, score: 0, correct: 0, wrong: 0, q: null, answered: true, after: null, boss: null };
 }
 
-function goHome() {
-  if (state.timerId) clearInterval(state.timerId);
-  if (state.peer) { try { state.peer.destroy(); } catch(e){} }
-  if (state.channel) { try { state.channel.close(); } catch(e){} }
-  renderStartScreen();
+function showStart() {
+  S = {};
+  view.innerHTML = `<div class="wrap"><div class="card hero">
+    <div class="big pop">📊</div>
+    <h1>Planilha Premiada</h1>
+    <p class="mut">Jogo educacional de dados administrativos · SENAI Afonso Pena · TGDQ</p>
+    <p>Você acaba de ser contratado como <b>analista de dados iniciante</b> no <b>${EMPRESA}</b>. Seu cargo é um dos mais baixos da empresa, e sua missão é provar que merece crescer. Resolva desafios de <b>erros em planilhas</b> e <b>porcentagem de vendas</b>, suba de cargo e, no final, enfrente o chefe: uma <b>inteligência artificial</b>.</p>
+    <ol class="how">
+      <li>Cada resposta certa vale <b>100 pontos</b> e <b>100 XP</b>.</li>
+      <li>Junte XP para ser promovido: Estagiário → Assistente → Júnior → Pleno → Sênior → <b>Gerente de Dados</b> (200, 300, 400, 500 e 600 XP).</li>
+      <li>Você tem <b>2 vidas</b> por cargo. Errou, perde uma. Sem vidas, você volta ao cargo de Estagiário.</li>
+      <li>Como Gerente, enfrente o <b>${BOSS}</b>: acerte <b>5 perguntas</b> antes do <b>3º erro</b> (no máximo 7 perguntas) e conquiste o cargo de <b>Diretor de Análise</b>.</li>
+    </ol>
+    <button class="btn" id="go">▶ Começar carreira</button>
+    <button class="btn alt" id="kh">👥 Modo Kahoot (turma)</button>
+    <p class="credits">Integrantes: Kael Oliveira Delgado · Zaquel Pereira Monteiro · Natã Cidral</p>
+  </div></div>`;
+  $('#go').onclick = () => { newGame(); nextQ(); };
+  $('#kh').onclick = khMenu;
 }
 
-/* ==========================================================================
-   4. LÓGICA DO HOST / PROFESSOR (WEBRTC + FALLBACK)
-   ========================================================================== */
-function setupHostMode() {
-  state.mode = 'HOST';
-  state.roomCode = Math.floor(1000 + Math.random() * 9000).toString(); // Código de 4 dígitos
-  state.playersList = {};
-  state.questions = getAllQuestions();
-  state.usingFallback = false;
-
-  setScreen(`
-    <div class="max-w-md w-full bg-slate-800 border border-slate-700 rounded-3xl p-8 text-center pop">
-      <div class="animate-spin text-4xl mb-4">🔄</div>
-      <h3 class="text-xl font-bold text-white mb-2">Iniciando Sala de Aula...</h3>
-      <p class="text-slate-400 text-sm">Gerando código ${state.roomCode}</p>
-    </div>
-  `);
-
-  // Tenta criar conexão via PeerJS
-  try {
-    const peerId = 'planilha-premiada-room-' + state.roomCode;
-    state.peer = new Peer(peerId);
-
-    const peerTimeout = setTimeout(() => {
-      console.warn("PeerJS demorou para responder. Ativando fallback de BroadcastChannel.");
-      enableHostFallback();
-    }, 3000);
-
-    state.peer.on('open', () => {
-      clearTimeout(peerTimeout);
-      renderHostLobbyScreen();
-    });
-
-    state.peer.on('connection', (conn) => {
-      conn.on('data', (data) => handleHostReceiveData(conn.peer, data, conn));
-      conn.on('close', () => {
-        delete state.playersList[conn.peer];
-        updateHostLobbyUI();
-      });
-    });
-
-    state.peer.on('error', (err) => {
-      clearTimeout(peerTimeout);
-      enableHostFallback();
-    });
-  } catch(e) {
-    enableHostFallback();
-  }
-}
-
-function enableHostFallback() {
-  state.usingFallback = true;
-  if (state.peer) { try { state.peer.destroy(); } catch(e){} }
-
-  const channelName = 'planilha_premiada_room_' + state.roomCode;
-  state.channel = new BroadcastChannel(channelName);
-
-  state.channel.onmessage = (event) => {
-    const { senderId, data } = event.data;
-    handleHostReceiveData(senderId, data, {
-      send: (msg) => {
-        state.channel.postMessage({ targetId: senderId, data: msg });
-      }
-    });
-  };
-
-  renderHostLobbyScreen();
-}
-
-function renderHostLobbyScreen() {
-  state.gameState = 'LOBBY';
-  const protocol = window.location.protocol.startsWith('http') ? window.location.protocol : 'https:';
-  const joinUrl = `${protocol}//${window.location.host}${window.location.pathname}?room=${state.roomCode}`;
-
-  const htmlContent = `
-    <div class="max-w-4xl w-full bg-slate-800/95 border border-slate-700 rounded-3xl p-6 md:p-8 shadow-2xl pop">
-      <!-- HEADER DO HOST -->
-      <div class="flex flex-col md:flex-row items-center justify-between border-b border-slate-700 pb-4 gap-4">
-        <div>
-          <span class="text-xs font-extrabold text-emerald-400 tracking-wider uppercase bg-emerald-950 px-3 py-1 rounded-full border border-emerald-500/30">Sala Aberta</span>
-          <h2 class="text-2xl md:text-3xl font-black text-white mt-1">Aguardando Alunos...</h2>
-        </div>
-        <div class="bg-slate-900 px-6 py-3 rounded-2xl border border-slate-700 text-center">
-          <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-widest">Código da Sala</span>
-          <span class="text-4xl font-black text-emerald-400 tracking-wider">${state.roomCode}</span>
-        </div>
-      </div>
-
-      <!-- INSTRUÇÕES E LISTA DE ALUNOS -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-6 items-center">
-        <!-- PAINEL QR CODE -->
-        <div class="bg-white p-4 rounded-2xl flex flex-col items-center justify-center shadow-lg">
-          <div id="qrcode" class="flex justify-center items-center min-h-[130px]"></div>
-          <span class="text-slate-800 font-bold text-xs mt-2 text-center">Entrar pelo Celular</span>
-          <button onclick="copyJoinLink('${joinUrl}')" class="mt-2 text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded border border-slate-300">
-            📋 Copiar Link
-          </button>
-        </div>
-
-        <!-- LISTA DE ALUNOS -->
-        <div class="md:col-span-2 bg-slate-900/60 rounded-2xl p-4 border border-slate-700 h-64 overflow-y-auto">
-          <div class="flex justify-between items-center mb-3">
-            <span class="font-bold text-slate-300 text-sm">Jogadores Na Sala:</span>
-            <span id="playerCount" class="bg-emerald-600 text-white font-extrabold text-xs px-2.5 py-1 rounded-full">0 Alunos</span>
-          </div>
-          <div id="playersGrid" class="flex flex-wrap gap-2">
-            <span class="text-slate-500 text-sm italic">Nenhum jogador entrou ainda...</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- AÇÃO DO HOST -->
-      <div class="flex justify-between items-center pt-4 border-t border-slate-700">
-        <div class="text-xs text-slate-400">
-          Projete esta tela para a turma acompanhar as perguntas e o placar.
-        </div>
-        <button id="startHostBtn" onclick="startHostGame()" disabled class="bg-emerald-600 disabled:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-emerald-500 active:scale-95 text-white font-black text-lg py-3.5 px-8 rounded-2xl shadow-lg transition">
-          🚀 Iniciar Jogo
-        </button>
-      </div>
-    </div>
-  `;
-
-  setScreen(htmlContent);
-
-  // Gerar QR Code
-  setTimeout(() => {
-    try {
-      const qrContainer = $('#qrcode');
-      if (qrContainer) {
-        qrContainer.innerHTML = '';
-        if (window.QRCode) {
-          new QRCode(qrContainer, {
-            text: joinUrl,
-            width: 130,
-            height: 130,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-          });
-        } else {
-          qrContainer.innerHTML = `<span class="text-xs text-slate-700 font-bold">Código: ${state.roomCode}</span>`;
-        }
-      }
-    } catch(e) {}
-  }, 50);
-}
-
-function copyJoinLink(url) {
-  const t = document.createElement('textarea');
-  t.value = url;
-  document.body.appendChild(t);
-  t.select();
-  document.execCommand('copy');
-  document.body.removeChild(t);
-  alert('Link de entrada copiado!');
-}
-
-function handleHostReceiveData(senderId, data, connWrapper) {
-  if (data.type === 'JOIN') {
-    state.playersList[senderId] = {
-      conn: connWrapper,
-      name: data.name || 'Aluno Anônimo',
-      score: 0,
-      answered: false,
-      lastChoice: null,
-      streak: 0
+function hudData() {
+  if (S.phase === 1) {
+    const need = NEED[S.cargo], nxt = CARGOS[S.cargo + 1][0];
+    return {
+      h1: `${CARGOS[S.cargo][1]} ${CARGOS[S.cargo][0]}`, h2: `⭐ ${S.score} pts`,
+      h3: `${'❤️'.repeat(S.lives)}${'🖤'.repeat(2 - S.lives)} Vidas`,
+      h4: `XP ${S.xp}/${need}`, h5: `Próximo cargo: ${nxt}`, bar: Math.min(100, S.xp / need * 100),
+      lad: CARGOS.map((c, i) => `<span class="${i < S.cargo ? 'done' : i === S.cargo ? 'cur' : i === 6 ? 'goal' : ''}" title="${c[0]}"></span>`).join('')
     };
-    sfx('tick');
-    if (state.gameState === 'LOBBY') {
-      updateHostLobbyUI();
-    }
-  } else if (data.type === 'ANSWER') {
-    const player = state.playersList[senderId];
-    if (player && !player.answered && state.gameState === 'QUESTION') {
-      player.answered = true;
-      player.lastChoice = data.choiceIndex;
-      updateHostQuestionAnswersCount();
-    }
   }
-}
-
-function updateHostLobbyUI() {
-  const count = Object.keys(state.playersList).length;
-  const countEl = $('#playerCount');
-  if (countEl) countEl.textContent = `${count} ${count === 1 ? 'Aluno' : 'Alunos'}`;
-  
-  const grid = $('#playersGrid');
-  if (grid) {
-    if (count === 0) {
-      grid.innerHTML = `<span class="text-slate-500 text-sm italic">Nenhum jogador entrou ainda...</span>`;
-      $('#startHostBtn').disabled = true;
-    } else {
-      grid.innerHTML = Object.values(state.playersList).map(p => `
-        <span class="bg-slate-800 border border-slate-600 text-slate-200 font-bold text-sm px-3 py-1.5 rounded-xl shadow-sm pop flex items-center gap-1.5">
-          <span>👤</span> ${p.name}
-        </span>
-      `).join('');
-      $('#startHostBtn').disabled = false;
-    }
-  }
-}
-
-function startHostGame() {
-  state.currentQIndex = 0;
-  broadcastToPlayers({ type: 'GAME_START' });
-  hostNextQuestion();
-}
-
-function hostNextQuestion() {
-  if (state.currentQIndex >= state.questions.length) {
-    hostGameOver();
-    return;
-  }
-
-  state.gameState = 'QUESTION';
-  state.timer = 25;
-  const q = state.questions[state.currentQIndex];
-
-  Object.values(state.playersList).forEach(p => {
-    p.answered = false;
-    p.lastChoice = null;
-  });
-
-  broadcastToPlayers({
-    type: 'NEW_QUESTION',
-    qNum: state.currentQIndex + 1,
-    totalQ: state.questions.length
-  });
-
-  renderHostQuestionScreen(q);
-
-  if (state.timerId) clearInterval(state.timerId);
-  state.timerId = setInterval(() => {
-    state.timer--;
-    const tEl = $('#hostTimer');
-    if (tEl) tEl.textContent = state.timer;
-    if (state.timer <= 5 && state.timer > 0) sfx('tick');
-    
-    if (state.timer <= 0) {
-      clearInterval(state.timerId);
-      evaluateHostAnswers();
-    }
-  }, 1000);
-}
-
-function updateHostQuestionAnswersCount() {
-  const players = Object.values(state.playersList);
-  const answeredCount = players.filter(p => p.answered).length;
-  const countEl = $('#hostAnswerCount');
-  if (countEl) {
-    countEl.textContent = `${answeredCount} / ${players.length}`;
-  }
-  if (answeredCount >= players.length && state.timerId) {
-    clearInterval(state.timerId);
-    evaluateHostAnswers();
-  }
-}
-
-function renderHostQuestionScreen(q) {
-  setScreen(`
-    <div class="max-w-5xl w-full bg-slate-800/95 border border-slate-700 rounded-3xl p-6 shadow-2xl pop">
-      <!-- HEADER DO HOST -->
-      <div class="flex items-center justify-between pb-4 border-b border-slate-700">
-        <span class="bg-slate-700 text-slate-200 font-extrabold text-sm px-4 py-1.5 rounded-full">
-          Pergunta ${state.currentQIndex + 1} de ${state.questions.length}
-        </span>
-        <div class="flex items-center gap-4">
-          <div class="text-center">
-            <span class="text-xs text-slate-400 block font-bold uppercase">Respostas</span>
-            <span id="hostAnswerCount" class="text-xl font-black text-emerald-400">0 / ${Object.keys(state.playersList).length}</span>
-          </div>
-          <div class="w-14 h-14 bg-indigo-600 border-4 border-indigo-400 text-white rounded-full flex items-center justify-center font-black text-2xl shadow-lg" id="hostTimer">
-            ${state.timer}
-          </div>
-        </div>
-      </div>
-
-      <!-- TEXTO DA QUESTÃO & TABELA -->
-      <div class="my-6 text-center">
-        <h3 class="text-2xl md:text-3xl font-black text-white leading-snug">${q.q}</h3>
-        ${q.grid ? renderSheetGrid(q.grid) : ''}
-      </div>
-
-      <!-- OPÇÕES KAHOOT DE 4 CORES -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        ${q.options.map((opt, i) => {
-          const c = KAHOOT_COLORS[i];
-          return `
-            <div class="${c.bg} border-b-4 ${c.border} rounded-2xl p-4 text-white font-bold text-lg md:text-xl flex items-center gap-4 shadow-lg">
-              <span class="bg-black/25 w-10 h-10 rounded-xl flex items-center justify-center text-xl font-black flex-shrink-0">${c.shape}</span>
-              <span class="flex-grow">${opt}</span>
-            </div>
-          `;
-        }).join('')}
-      </div>
-    </div>
-  `);
-}
-
-function evaluateHostAnswers() {
-  state.gameState = 'RESULT';
-  const q = state.questions[state.currentQIndex];
-  const correctIdx = q.correctIndex;
-
-  Object.values(state.playersList).forEach(p => {
-    const isCorrect = p.lastChoice === correctIdx;
-    let points = 0;
-    if (isCorrect) {
-      p.streak = (p.streak || 0) + 1;
-      const speedBonus = Math.floor((state.timer / 25) * 300);
-      points = 700 + speedBonus + (p.streak * 50);
-      p.score += points;
-    } else {
-      p.streak = 0;
-    }
-
-    if (p.conn && p.conn.send) {
-      p.conn.send({
-        type: 'ROUND_RESULT',
-        isCorrect: isCorrect,
-        points: points,
-        totalScore: p.score,
-        correctOptionText: q.options[correctIdx],
-        cargo: getCargo(p.score)
-      });
-    }
-  });
-
-  sfx('win');
-  renderHostRoundResultScreen(q);
-}
-
-function renderHostRoundResultScreen(q) {
-  const sortedPlayers = Object.values(state.playersList).sort((a, b) => b.score - a.score);
-
-  setScreen(`
-    <div class="max-w-4xl w-full bg-slate-800/95 border border-slate-700 rounded-3xl p-6 md:p-8 shadow-2xl pop">
-      <div class="text-center mb-6">
-        <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest bg-emerald-950 px-3 py-1 rounded-full border border-emerald-500/30">Gabarito da Rodada</span>
-        <h3 class="text-2xl font-black text-white mt-2">Resposta Correta: <span class="text-emerald-400">${q.options[q.correctIndex]}</span></h3>
-        <p class="text-slate-300 text-sm mt-1 max-w-xl mx-auto bg-slate-900/60 p-3 rounded-xl border border-slate-700">💡 ${q.exp}</p>
-      </div>
-
-      <!-- PLACAR PARCIAL -->
-      <div class="bg-slate-900/80 rounded-2xl p-4 border border-slate-700 my-6">
-        <h4 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 text-center">🏆 Liderança da Sala</h4>
-        <div class="space-y-2 max-h-64 overflow-y-auto pr-1">
-          ${sortedPlayers.slice(0, 5).map((p, idx) => {
-            const cargo = getCargo(p.score);
-            return `
-              <div class="flex items-center justify-between bg-slate-800 p-3 rounded-xl border border-slate-700">
-                <div class="flex items-center gap-3">
-                  <span class="font-black text-lg ${idx === 0 ? 'text-amber-400' : idx === 1 ? 'text-slate-300' : idx === 2 ? 'text-amber-600' : 'text-slate-500'}">#${idx + 1}</span>
-                  <div>
-                    <span class="font-bold text-white block leading-none">${p.name}</span>
-                    <span class="text-xs text-slate-400">${cargo.icon} ${cargo.name}</span>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <span class="font-black text-emerald-400 text-lg">${p.score} pts</span>
-                </div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      </div>
-
-      <div class="flex justify-end pt-4 border-t border-slate-700">
-        <button onclick="state.currentQIndex++; hostNextQuestion();" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-lg py-3.5 px-8 rounded-2xl shadow-lg transition">
-          ${state.currentQIndex + 1 >= state.questions.length ? '🏁 Ver Vencedores Finais' : 'Próxima Pergunta ➔'}
-        </button>
-      </div>
-    </div>
-  `);
-}
-
-function hostGameOver() {
-  state.gameState = 'GAMEOVER';
-  const sorted = Object.values(state.playersList).sort((a, b) => b.score - a.score);
-  broadcastToPlayers({ type: 'GAME_OVER' });
-  triggerConfetti();
-  sfx('win');
-
-  setScreen(`
-    <div class="max-w-3xl w-full bg-slate-800 border border-slate-700 rounded-3xl p-8 text-center shadow-2xl pop">
-      <div class="text-6xl mb-2">👑</div>
-      <h2 class="text-4xl font-black text-white">Fim de Jogo!</h2>
-      <p class="text-slate-300 text-base mb-8">Confira os campeões de análise de dados da turma:</p>
-
-      <div class="grid grid-cols-3 gap-3 items-end mb-8 max-w-md mx-auto">
-        ${sorted[1] ? `
-          <div class="bg-slate-700 p-3 rounded-2xl text-center border border-slate-600">
-            <div class="text-2xl">🥈</div>
-            <div class="font-bold text-white text-sm truncate">${sorted[1].name}</div>
-            <div class="text-emerald-400 font-black text-xs">${sorted[1].score} pts</div>
-          </div>
-        ` : '<div></div>'}
-        ${sorted[0] ? `
-          <div class="bg-amber-500/20 border-2 border-amber-400 p-4 rounded-2xl text-center shadow-xl">
-            <div class="text-4xl">🏆</div>
-            <div class="font-black text-white text-base truncate">${sorted[0].name}</div>
-            <div class="text-amber-400 font-black text-sm">${sorted[0].score} pts</div>
-          </div>
-        ` : '<div></div>'}
-        ${sorted[2] ? `
-          <div class="bg-slate-700 p-3 rounded-2xl text-center border border-slate-600">
-            <div class="text-2xl">🥉</div>
-            <div class="font-bold text-white text-sm truncate">${sorted[2].name}</div>
-            <div class="text-emerald-400 font-black text-xs">${sorted[2].score} pts</div>
-          </div>
-        ` : '<div></div>'}
-      </div>
-
-      <button onclick="goHome()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-lg py-4 px-8 rounded-2xl shadow-lg transition">
-        🔁 Voltar ao Menu Principal
-      </button>
-    </div>
-  `);
-}
-
-function broadcastToPlayers(data) {
-  Object.values(state.playersList).forEach(p => {
-    if (p.conn && p.conn.send) {
-      p.conn.send(data);
-    }
-  });
-}
-
-/* ==========================================================================
-   5. LÓGICA DO ALUNO / CELULAR
-   ========================================================================== */
-function setupPlayerMode() {
-  state.mode = 'PLAYER';
-  const urlParams = new URLSearchParams(window.location.search);
-  const codeParam = urlParams.get('room') || '';
-
-  setScreen(`
-    <div class="max-w-md w-full bg-slate-800 border border-slate-700 rounded-3xl p-6 md:p-8 shadow-2xl pop">
-      <div class="text-center mb-6">
-        <div class="inline-block text-4xl mb-2">📱</div>
-        <h2 class="text-2xl font-black text-white">Entrar na Sala</h2>
-        <p class="text-slate-400 text-sm">Digite seu nome e o código de 4 dígitos</p>
-      </div>
-
-      <form id="joinForm" onsubmit="connectPlayerToHost(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Seu Nome / Apelido</label>
-          <input type="text" id="inputPlayerName" required placeholder="Ex: Ana Silva" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-white font-bold placeholder-slate-500 focus:outline-none focus:border-emerald-500">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Código da Sala (4 dígitos)</label>
-          <input type="number" id="inputRoomCode" required value="${codeParam}" placeholder="Ex: 1234" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-white font-black text-2xl tracking-widest text-center placeholder-slate-500 focus:outline-none focus:border-emerald-500">
-        </div>
-        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-lg py-4 rounded-xl shadow-lg transition">
-          🚀 Entrar no Jogo
-        </button>
-      </form>
-    </div>
-  `);
-}
-
-function connectPlayerToHost(e) {
-  e.preventDefault();
-  state.playerName = $('#inputPlayerName').value.trim();
-  state.roomCode = $('#inputRoomCode').value.trim();
-
-  if (!state.playerName || !state.roomCode) return;
-
-  setScreen(`
-    <div class="max-w-md w-full bg-slate-800 border border-slate-700 rounded-3xl p-8 text-center pop">
-      <div class="animate-spin text-4xl mb-4">🔄</div>
-      <h3 class="text-xl font-bold text-white mb-2">Conectando à Sala ${state.roomCode}...</h3>
-    </div>
-  `);
-
-  const playerId = 'player_' + Math.random().toString(36).substring(2, 9);
-  let connected = false;
-
-  try {
-    state.peer = new Peer();
-    const peerTimeout = setTimeout(() => {
-      if (!connected) enablePlayerFallback(playerId);
-    }, 2500);
-
-    state.peer.on('open', () => {
-      const hostPeerId = 'planilha-premiada-room-' + state.roomCode;
-      const conn = state.peer.connect(hostPeerId);
-      state.hostConn = conn;
-
-      conn.on('open', () => {
-        connected = true;
-        clearTimeout(peerTimeout);
-        conn.send({ type: 'JOIN', name: state.playerName });
-        renderPlayerWaitLobby();
-      });
-
-      conn.on('data', (data) => handlePlayerReceiveData(data));
-      conn.on('error', () => enablePlayerFallback(playerId));
-    });
-
-    state.peer.on('error', () => enablePlayerFallback(playerId));
-  } catch(err) {
-    enablePlayerFallback(playerId);
-  }
-}
-
-function enablePlayerFallback(playerId) {
-  state.usingFallback = true;
-  if (state.peer) { try { state.peer.destroy(); } catch(e){} }
-
-  const channelName = 'planilha_premiada_room_' + state.roomCode;
-  state.channel = new BroadcastChannel(channelName);
-
-  state.hostConn = {
-    send: (payload) => {
-      state.channel.postMessage({ senderId: playerId, data: payload });
-    }
+  const b = S.boss;
+  return {
+    h1: `🤖 ${BOSS}`, h2: `⭐ ${S.score} pts`,
+    h3: `${'❤️'.repeat(Math.max(0, 2 - b.errors))}${'🖤'.repeat(Math.min(2, b.errors))} Erros ${b.errors}/2`,
+    h4: `Vida da IA: ${b.hp}%`, h5: `Pergunta ${b.asked} de 7`, bar: b.hp, lad: ''
   };
+}
+function updateHud() {
+  const d = hudData();
+  $('#h1').textContent = d.h1; $('#h2').textContent = d.h2; $('#h3').textContent = d.h3;
+  $('#h4').textContent = d.h4; $('#h5').textContent = d.h5;
+  $('#hBar').style.width = d.bar + '%'; $('#hLad').innerHTML = d.lad;
+}
 
-  state.channel.onmessage = (event) => {
-    const { targetId, data } = event.data;
-    if (!targetId || targetId === playerId) {
-      handlePlayerReceiveData(data);
+function nextQ() { S.phase = 1; S.q = pickQuestion(tierFor(S.cargo)); renderPlay(); }
+function nextBossQ() { S.boss.asked++; S.q = pickQuestion(3); renderPlay(); }
+
+function renderPlay() {
+  const q = S.q; q.shuf = shuffle(q.options); S.answered = false;
+  view.innerHTML = `<div class="wrap">
+    <div class="card hud ${S.phase === 2 ? 'boss' : ''}">
+      <div class="stats"><span class="pill" id="h1"></span><span class="pill" id="h2"></span><span class="pill" id="h3"></span></div>
+      <div class="xprow"><span id="h4"></span><span id="h5"></span></div>
+      <div class="bar"><i id="hBar"></i></div><div class="ladder" id="hLad"></div>
+    </div>
+    <div class="card" id="qcard">${q.grid ? gridHTML(q.grid) : ''}
+      <p class="qtext">${q.q}</p>
+      <div class="opts">${q.shuf.map((o, i) => `<button class="opt" data-i="${i}"><span class="k">${'ABCD'[i]}</span><span>${o}</span></button>`).join('')}</div>
+      <div id="fb" aria-live="polite"></div>
+    </div></div>`;
+  view.querySelectorAll('.opt').forEach(b => { b.onclick = () => answer(+b.dataset.i); });
+  updateHud();
+  window.scrollTo({ top: 0 });
+}
+
+function answer(i) {
+  if (S.answered) return;
+  S.answered = true;
+  const q = S.q, ok = q.shuf[i] === q.correct;
+  view.querySelectorAll('.opt').forEach((b, j) => {
+    b.disabled = true;
+    if (q.shuf[j] === q.correct) b.classList.add('ok'); else if (j === i) b.classList.add('bad');
+  });
+  let msg, label = 'Próxima pergunta ➜', after;
+  if (S.phase === 1) {
+    if (ok) {
+      S.score += 100; S.xp += 100; S.correct++; sfx('ok');
+      msg = '✅ <b>Correto!</b> +100 pontos e +100 XP.';
+      if (S.xp >= NEED[S.cargo]) { label = '🎉 Ver promoção'; after = promote; } else after = nextQ;
+    } else {
+      S.lives--; S.wrong++; sfx('bad'); $('#qcard').classList.add('shake');
+      msg = '❌ <b>Não foi dessa vez.</b> Você perdeu 1 vida.';
+      if (S.lives <= 0) { label = 'Continuar'; after = showFired; } else after = nextQ;
     }
-  };
-
-  state.hostConn.send({ type: 'JOIN', name: state.playerName });
-  renderPlayerWaitLobby();
-}
-
-function renderPlayerWaitLobby() {
-  setScreen(`
-    <div class="max-w-md w-full bg-slate-800 border border-slate-700 rounded-3xl p-8 text-center pop">
-      <div class="text-5xl mb-3">✅</div>
-      <h2 class="text-2xl font-black text-white">Você está DENTRO!</h2>
-      <p class="text-emerald-400 font-bold text-lg mt-1">${state.playerName}</p>
-      <p class="text-slate-400 text-sm mt-4">Olhe para a tela do professor para acompanhar o jogo.</p>
-    </div>
-  `);
-}
-
-function handlePlayerReceiveData(data) {
-  if (data.type === 'NEW_QUESTION') {
-    renderPlayerButtonsScreen(data);
-  } else if (data.type === 'ROUND_RESULT') {
-    renderPlayerRoundResultState(data);
-  } else if (data.type === 'GAME_OVER') {
-    renderPlayerGameOverState();
-  }
-}
-
-function renderPlayerButtonsScreen(data) {
-  setScreen(`
-    <div class="max-w-md w-full bg-slate-800 border border-slate-700 rounded-3xl p-4 md:p-6 shadow-2xl pop">
-      <div class="text-center mb-4">
-        <span class="text-xs font-bold text-slate-400 uppercase">Pergunta ${data.qNum} de ${data.totalQ}</span>
-        <h3 class="text-white font-black text-lg mt-1">Selecione sua resposta no celular:</h3>
-      </div>
-
-      <div class="grid grid-cols-2 gap-4 h-64">
-        ${KAHOOT_COLORS.map((c, idx) => `
-          <button onclick="sendPlayerAnswer(${idx})" class="${c.bg} ${c.hover} ${c.border} border-b-8 rounded-2xl flex items-center justify-center text-4xl text-white font-black transition active:scale-90">
-            ${c.shape}
-          </button>
-        `).join('')}
-      </div>
-    </div>
-  `);
-}
-
-function sendPlayerAnswer(choiceIdx) {
-  if (state.hostConn) {
-    state.hostConn.send({ type: 'ANSWER', choiceIndex: choiceIdx });
-    renderPlayerAnswerSentState();
-  }
-}
-
-function renderPlayerAnswerSentState() {
-  setScreen(`
-    <div class="max-w-md w-full bg-slate-800 border border-slate-700 rounded-3xl p-8 text-center pop">
-      <div class="text-6xl mb-4 animate-bounce">👍</div>
-      <h3 class="text-2xl font-black text-white">Resposta Enviada!</h3>
-      <p class="text-slate-400 text-sm mt-2">Aguarde o encerramento do tempo na tela principal.</p>
-    </div>
-  `);
-}
-
-function renderPlayerRoundResultState(data) {
-  if (data.isCorrect) sfx('ok'); else sfx('bad');
-  
-  setScreen(`
-    <div class="max-w-md w-full ${data.isCorrect ? 'bg-emerald-950 border-emerald-500' : 'bg-rose-950 border-rose-500'} border-2 rounded-3xl p-8 text-center shadow-2xl pop">
-      <div class="text-6xl mb-2">${data.isCorrect ? '🎉' : '❌'}</div>
-      <h2 class="text-3xl font-black text-white">${data.isCorrect ? 'VOCÊ ACERTOU!' : 'INCORRETO'}</h2>
-      
-      <div class="my-6 bg-slate-900/60 p-4 rounded-2xl border border-white/10">
-        <span class="text-xs text-slate-400 font-bold uppercase block">Pontos Ganho</span>
-        <span class="text-4xl font-black ${data.isCorrect ? 'text-emerald-400' : 'text-slate-400'}">+${data.points}</span>
-        <span class="block text-xs text-slate-300 mt-2">Total: <b>${data.totalScore} pts</b></span>
-      </div>
-
-      <div class="flex items-center justify-center gap-2 text-sm bg-black/30 py-2 px-4 rounded-xl">
-        <span>${data.cargo.icon}</span>
-        <span class="font-bold text-white">${data.cargo.name}</span>
-      </div>
-    </div>
-  `);
-}
-
-function renderPlayerGameOverState() {
-  triggerConfetti();
-  setScreen(`
-    <div class="max-w-md w-full bg-slate-800 border border-slate-700 rounded-3xl p-8 text-center shadow-2xl pop">
-      <div class="text-6xl mb-2">🏁</div>
-      <h2 class="text-3xl font-black text-white">Fim de Jogo!</h2>
-      <p class="text-slate-300 text-sm mt-2">Veja os vencedores na tela do professor!</p>
-      <button onclick="goHome()" class="mt-6 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl transition">
-        🏠 Menu Principal
-      </button>
-    </div>
-  `);
-}
-
-/* ==========================================================================
-   6. MODO SOLO / LOCAL
-   ========================================================================== */
-function setupLocalMode() {
-  state.mode = 'LOCAL';
-  state.questions = getAllQuestions();
-  state.currentQIndex = 0;
-  state.playerScore = 0;
-  state.streak = 0;
-  renderLocalQuestion();
-}
-
-function renderLocalQuestion() {
-  if (state.currentQIndex >= state.questions.length) {
-    renderLocalGameOver();
-    return;
-  }
-  const q = state.questions[state.currentQIndex];
-  const cargo = getCargo(state.playerScore);
-
-  setScreen(`
-    <div class="max-w-3xl w-full bg-slate-800 border border-slate-700 rounded-3xl p-6 md:p-8 shadow-2xl pop">
-      <div class="flex items-center justify-between pb-4 border-b border-slate-700 mb-4">
-        <div class="flex items-center gap-2">
-          <span class="text-2xl">${cargo.icon}</span>
-          <div>
-            <span class="text-xs text-slate-400 block font-bold leading-none">Cargo</span>
-            <span class="font-bold text-white text-sm">${cargo.name}</span>
-          </div>
-        </div>
-        <div class="text-right">
-          <span class="text-xs text-slate-400 block font-bold leading-none">Pontuação</span>
-          <span class="text-xl font-black text-emerald-400">${state.playerScore} pts</span>
-        </div>
-      </div>
-
-      <div class="my-4">
-        <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Questão ${state.currentQIndex + 1} de ${state.questions.length}</span>
-        <h3 class="text-xl md:text-2xl font-black text-white mt-1">${q.q}</h3>
-        ${q.grid ? renderSheetGrid(q.grid) : ''}
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-6">
-        ${q.options.map((opt, i) => `
-          <button onclick="answerLocal(${i})" class="bg-slate-700 hover:bg-slate-600 active:scale-95 text-left border border-slate-600 rounded-2xl p-4 text-white font-bold text-base transition flex items-center gap-3">
-            <span class="bg-emerald-600/30 text-emerald-400 border border-emerald-500/40 w-8 h-8 rounded-xl flex items-center justify-center font-black flex-shrink-0">${'ABCD'[i]}</span>
-            <span>${opt}</span>
-          </button>
-        `).join('')}
-      </div>
-    </div>
-  `);
-}
-
-function answerLocal(idx) {
-  const q = state.questions[state.currentQIndex];
-  const isCorrect = idx === q.correctIndex;
-  
-  if (isCorrect) {
-    state.streak++;
-    state.playerScore += 100 + (state.streak * 20);
-    sfx('ok');
   } else {
-    state.streak = 0;
-    sfx('bad');
+    const b = S.boss;
+    if (ok) {
+      b.hits++; b.hp = Math.max(0, 100 - b.hits * 20); S.score += 100; S.correct++; sfx('ok');
+      msg = `✅ <b>Acertou!</b> O ${BOSS} sofreu 20% de dano.`;
+      if (b.hits >= 5) { label = '🏆 Ver resultado'; after = showWin; } else after = nextBossQ;
+    } else {
+      b.errors++; S.wrong++; sfx('bad'); $('#qcard').classList.add('shake');
+      msg = `❌ <b>Errou!</b> ${b.errors > 2 ? 'Esse foi o terceiro erro.' : `Você já cometeu ${b.errors} de 2 erros permitidos. O próximo erro é fatal.`}`;
+      if (b.errors > 2) { label = 'Continuar'; after = showLose; } else after = nextBossQ;
+    }
   }
-
-  setScreen(`
-    <div class="max-w-2xl w-full bg-slate-800 border border-slate-700 rounded-3xl p-8 text-center shadow-2xl pop">
-      <div class="text-6xl mb-2">${isCorrect ? '✅' : '❌'}</div>
-      <h3 class="text-2xl font-black text-white">${isCorrect ? 'Resposta Correta!' : 'Incorreta'}</h3>
-      <p class="text-slate-300 text-sm mt-2">Resposta certa: <strong class="text-emerald-400">${q.options[q.correctIndex]}</strong></p>
-      <p class="text-xs text-slate-400 mt-2 bg-slate-900/60 p-3 rounded-xl border border-slate-700">💡 ${q.exp}</p>
-      
-      <button onclick="state.currentQIndex++; renderLocalQuestion();" class="mt-6 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-lg py-3 px-8 rounded-2xl shadow-lg transition">
-        Próxima ➔
-      </button>
-    </div>
-  `);
+  updateHud();
+  $('#fb').innerHTML = `<div class="fb ${ok ? 'ok' : 'bad'}">${msg}
+    ${ok ? '' : `<p>Resposta certa: <b>${q.correct}</b></p>`}<p>💡 ${q.exp}</p>
+    <button class="btn" id="nx">${label}</button></div>`;
+  const nx = $('#nx'); nx.onclick = after; nx.focus({ preventScroll: true });
+  nx.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
-function renderLocalGameOver() {
-  triggerConfetti();
-  sfx('win');
-  const cargo = getCargo(state.playerScore);
-
-  setScreen(`
-    <div class="max-w-xl w-full bg-slate-800 border border-slate-700 rounded-3xl p-8 text-center shadow-2xl pop">
-      <div class="text-6xl mb-2">${cargo.icon}</div>
-      <h2 class="text-3xl font-black text-white">Fim da Carreira!</h2>
-      <p class="text-slate-300 text-base mt-1">Sua promoção final:</p>
-      <div class="text-2xl font-black text-emerald-400 my-2">${cargo.name}</div>
-      <div class="text-xl font-bold text-white mb-6">Pontuação Final: ${state.playerScore} pts</div>
-
-      <button onclick="goHome()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-lg py-3.5 px-8 rounded-2xl shadow-lg transition">
-        🔁 Jogar Novamente
-      </button>
-    </div>
-  `);
+function promote() {
+  S.cargo++; S.xp = 0; S.lives = 2; sfx('promo'); confetti();
+  const last = S.cargo === 5, [n, e] = CARGOS[S.cargo];
+  view.innerHTML = `<div class="wrap"><div class="card hero">
+    <div class="big pop">${e}</div><h2>PROMOÇÃO!</h2>
+    <p>Você agora é <b>${n}</b>.</p>
+    <p class="mut">${last
+      ? `Você conquistou todas as promoções. Só falta o cargo de <b>Diretor de Análise</b>, e quem guarda essa cadeira é o <b>${BOSS}</b>, a IA que controla os relatórios do ${EMPRESA}.`
+      : `Próxima meta: ${NEED[S.cargo]} de XP para virar ${CARGOS[S.cargo + 1][0]}. Suas vidas foram restauradas.`}</p>
+    <button class="btn" id="go">${last ? '🚪 Entrar na sala do chefe' : 'Continuar ➜'}</button></div></div>`;
+  $('#go').onclick = last ? showBossIntro : nextQ;
 }
 
-// Inicializar na Tela Inicial
-window.onload = () => {
-  renderStartScreen();
+function showBossIntro() {
+  view.innerHTML = `<div class="wrap"><div class="card hero">
+    <div class="big pop">🤖</div><h2>A sala do chefe</h2>
+    <div class="dialog">&gt; ${BOSS} ONLINE<br>&gt; Analista detectado.<br>&gt; Seus relatórios serão auditados.<br>&gt; Errar três vezes significa desligamento.</div>
+    <ol class="how">
+      <li>A batalha tem até <b>7 perguntas</b> sobre erros em planilhas e porcentagens.</li>
+      <li>Cada acerto causa <b>20% de dano</b> na IA. Com <b>5 acertos</b>, ela é derrotada.</li>
+      <li>Você pode errar <b>no máximo 2 vezes</b>. No <b>3º erro</b>, é Game Over.</li>
+    </ol>
+    <button class="btn" id="go">⚔️ Iniciar batalha</button></div></div>`;
+  $('#go').onclick = startBoss;
+}
+function startBoss() { S.phase = 2; S.boss = { hp: 100, errors: 0, asked: 0, hits: 0 }; nextBossQ(); }
+
+function showFired() {
+  sfx('lose');
+  view.innerHTML = `<div class="wrap"><div class="card hero">
+    <div class="big pop">📉</div><h2>Fim das vidas!</h2>
+    <p>Os erros se acumularam e você perdeu a vaga de <b>${CARGOS[S.cargo][0]}</b>. Sua carreira volta ao começo.</p>
+    <p class="mut">Você retorna ao cargo de <b>${CARGOS[0][0]}</b>, com o XP zerado. Seus pontos ficam. Dá para tentar de novo!</p>
+    <button class="btn" id="go">↩ Recomeçar como ${CARGOS[0][0]}</button></div></div>`;
+  $('#go').onclick = () => { S.cargo = 0; S.xp = 0; S.lives = 2; nextQ(); };
+}
+
+function showLose() {
+  sfx('lose');
+  view.innerHTML = `<div class="wrap"><div class="card hero">
+    <div class="big pop">💀</div><h2>GAME OVER</h2>
+    <div class="dialog">&gt; ${BOSS}: três falhas registradas.<br>&gt; Relatório reprovado.<br>&gt; Estude os erros e volte para a auditoria.</div>
+    <p class="mut">Você acertou ${S.boss.hits} de 5 acertos necessários.</p>
+    <button class="btn" id="again">⚔️ Tentar a batalha de novo</button>
+    <button class="btn alt" id="restart">Recomeçar carreira</button></div></div>`;
+  $('#again').onclick = startBoss;
+  $('#restart').onclick = () => { newGame(); nextQ(); };
+}
+
+function showWin() {
+  S.cargo = 6; sfx('win'); confetti();
+  view.innerHTML = `<div class="wrap"><div class="card hero">
+    <div class="big pop">👑</div><h1>PARABÉNS!</h1>
+    <p>Você derrotou o <b>${BOSS}</b> e conquistou o cargo máximo do ${EMPRESA}: <b>Diretor de Análise</b>.</p>
+    <p class="mut">De estagiário a diretor, usando dados com atenção e responsabilidade. Excelente trabalho!</p>
+    <div class="stat3"><div><b>${S.score}</b>pontos</div><div><b>${S.correct}</b>acertos</div><div><b>${S.wrong}</b>erros</div></div>
+    <button class="btn" id="go">🔁 Jogar novamente</button>
+    <p class="credits">Criado por Kael Oliveira Delgado, Zaquel Pereira Monteiro e Natã Cidral<br>SENAI Afonso Pena · Assistente Administrativo · TGDQ</p>
+  </div></div>`;
+  $('#go').onclick = showStart;
+}
+
+
+/* ======================= modo Kahoot (turma) =======================
+   Toda a partida viaja pela "presença" da sala em tempo real:
+   - o professor publica o estado do jogo (PIN, pergunta, resultado);
+   - cada aluno publica apelido, resposta, tempo e pontos;
+   - todos calculam o placar a partir da presença de todos. */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const fmt = n => (+n || 0).toLocaleString('pt-BR');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const safeB = s => esc(s).replace(/&lt;(\/?)b&gt;/g, '<$1b>');   // só <b> é permitido
+const KSHP = ['▲', '◆', '●', '■'];
+const KS_HOST = 'pp_kh_host', KS_PLAYER = 'pp_kh_player';
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sem armazenamento: tudo bem */ } },
+  del(k) { try { localStorage.removeItem(k); } catch (e) { /* idem */ } }
 };
+const KH = { room: null, user: null, ready: false, canHost: false, peers: [], conn: true, role: null, tick: null, tm: null };
+let H = null, P = null;
+const clampLim = v => Math.min(60, Math.max(5, +v || 20));
+
+function khStop() { clearInterval(KH.tick); clearTimeout(KH.tm); KH.tick = null; KH.tm = null; }
+function khClear() {
+  if (!KH.room) return;
+  KH.room.presence({ role: null, gid: null, st: null, i: null, n: null, lim: null, q: null, rv: null, nm: null, sc: null, sk: null, dl: null, ai: null, ac: null, ams: null, si: null, ok: null }).catch(() => {});
+}
+function khExit() { khStop(); khClear(); KH.role = null; H = null; P = null; showStart(); }
+
+
+/* ---------- sala em tempo real fora do claude.ai (MQTT público via WebSocket) ----------
+   Imita a API "room" (presence / onPeers / onConnection / connected). Cada aparelho publica
+   sua presença num tópico próprio; o "will" apaga a presença se a aba fechar. */
+function mqttRoom() {
+  return new Promise(resolve => {
+    if (!window.mqtt) return resolve(null);
+    const NS = 'pp-premiada-k7x3/p/';
+    const URLS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
+    const me = Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+    let ui = 0, client = null, up = false, done = false, local = {}, hb = null;
+    const remote = new Map(), peersCb = [], connCb = [];
+    const emit = () => {
+      const now = Date.now(), peers = [];
+      remote.forEach((v, id) => { if (now - v.ts > 25000) remote.delete(id); else peers.push({ peer: id, presence: v.pr, sameTab: false }); });
+      peers.push({ peer: me, presence: Object.assign({}, local), sameTab: true });
+      peersCb.forEach(f => { try { f({ peers }); } catch (e) {} });
+    };
+    const pub = () => { if (client && up) try { client.publish(NS + me, JSON.stringify({ ts: Date.now(), pr: local }), { retain: true, qos: 0 }); } catch (e) {} };
+    const room = {
+      presence(patch) { Object.keys(patch || {}).forEach(k => { if (patch[k] == null) delete local[k]; else local[k] = patch[k]; }); pub(); emit(); return Promise.resolve(); },
+      connected() { return up; },
+      onPeers(cb) { peersCb.push(cb); setTimeout(emit, 0); },
+      onConnection(cb) { connCb.push(cb); }
+    };
+    const open = () => {
+      try { if (client) client.end(true); } catch (e) {}
+      client = window.mqtt.connect(URLS[ui], { clientId: 'pp_' + me, reconnectPeriod: 2500, connectTimeout: 6000, clean: true,
+        will: { topic: NS + me, payload: '', retain: true, qos: 0 } });
+      client.on('connect', () => {
+        up = true; client.subscribe(NS + '#');
+        pub(); connCb.forEach(f => { try { f(true); } catch (e) {} });
+        if (!hb) hb = setInterval(() => { pub(); emit(); }, 5000);
+        if (!done) { done = true; resolve(room); }
+      });
+      const down = () => { if (up) { up = false; connCb.forEach(f => { try { f(false); } catch (e) {} }); } };
+      client.on('close', down); client.on('offline', down);
+      client.on('message', (t, buf) => {
+        const id = t.slice(NS.length); if (id === me) return;
+        const txt = buf.toString();
+        if (!txt) { remote.delete(id); emit(); return; }
+        try { const o = JSON.parse(txt); if (o && o.pr && Date.now() - o.ts < 25000) { remote.set(id, { ts: o.ts, pr: o.pr }); emit(); } } catch (e) {}
+      });
+    };
+    open();
+    setTimeout(() => { if (!done && ui + 1 < URLS.length) { ui++; open(); } }, 6500);
+    setTimeout(() => { if (!done) { done = true; try { client.end(true); } catch (e) {} resolve(null); } }, 14000);
+    window.addEventListener('pagehide', () => { try { client.publish(NS + me, '', { retain: true }); client.end(true); } catch (e) {} });
+  });
+}
+
+async function khConnect() {
+  if (KH.ready) return !!KH.room;
+  const use = n => (window.claude && window.claude.use) ? window.claude.use(n).catch(() => null) : Promise.resolve(null);
+  KH.room = await use('room');
+  KH.user = await use('user');
+  if (!KH.room) { KH.room = await mqttRoom(); KH.user = null; }
+  try { KH.canHost = KH.user ? await KH.user.canEdit() : true; } catch (e) { KH.canHost = true; }
+  if (KH.room) {
+    try { KH.conn = KH.room.connected(); } catch (e) { KH.conn = true; }
+    KH.room.onPeers(ch => { KH.peers = ch.peers; khPeers(); }, () => { KH.conn = false; khPeers(); });
+    KH.room.onConnection(c => { KH.conn = c; khPeers(); }, () => {});
+  }
+  KH.ready = true;
+  return !!KH.room;
+}
+function khPeers() {
+  if (KH.role === 'host') hostUpdate();
+  else if (KH.role === 'player') pSync();
+}
+
+/* quem está na sala com este PIN (jogadores) */
+function khPlayers(gid) {
+  return KH.peers.filter(p => p.presence && p.presence.role === 'p' && p.presence.gid === gid).map(p => {
+    const x = p.presence;
+    return { id: p.peer, me: !!p.sameTab, nm: String(x.nm == null ? '?' : x.nm).slice(0, 16), sc: +x.sc || 0, dl: +x.dl || 0, sk: +x.sk || 0,
+      ai: Number.isInteger(x.ai) ? x.ai : -1, ac: Number.isInteger(x.ac) ? x.ac : -1 };
+  });
+}
+const khBoard = gid => khPlayers(gid).sort((a, b) => b.sc - a.sc || a.nm.localeCompare(b.nm, 'pt-BR'));
+const warnBar = () => `<div class="warn" id="connw" ${KH.conn ? 'hidden' : ''}>Sem conexão com a sala. Tentando reconectar…</div>`;
+
+function boardHTML(list, max, showDelta) {
+  if (!list.length) return '<p class="mut">Ninguém na sala.</p>';
+  return '<div class="bd">' + list.slice(0, max).map((p, k) =>
+    `<div class="r${p.me ? ' me' : ''}"><span class="p">${k + 1}º</span><span class="n">${esc(p.nm)}</span>${showDelta && p.dl > 0 ? `<span class="d">+${fmt(p.dl)}</span>` : ''}<b>${fmt(p.sc)}</b></div>`).join('') + '</div>'
+    + (list.length > max ? `<p class="mut">e mais ${list.length - max} jogadores</p>` : '');
+}
+function podiumHTML(list) {
+  if (!list.length) return '';
+  const g = [list[1], list[0], list[2]], hs = [100, 140, 72], cl = ['#aab4af', '#f2b705', '#c98a52'], lb = ['2º', '1º', '3º'];
+  return '<div class="pod">' + g.map((p, k) => p
+    ? `<div class="col"><div class="pn">${esc(p.nm)}</div><div class="ps">${fmt(p.sc)} pts</div><div class="blk" style="height:${hs[k]}px;background:${cl[k]}">${lb[k]}</div></div>`
+    : '<div class="col"></div>').join('') + '</div>';
+}
+
+/* ======================= menu e entrada ======================= */
+async function khMenu() {
+  khStop(); KH.role = null; H = null; P = null;
+  view.innerHTML = `<div class="wrap"><div class="card hero"><div class="big pop">👥</div><h2>Conectando…</h2><p class="mut">Procurando a sala da turma.</p></div></div>`;
+  const ok = await khConnect();
+  if (!ok) {
+    view.innerHTML = `<div class="wrap"><div class="card hero"><div class="big">📴</div><h2>Modo Kahoot indisponível aqui</h2>
+      <p>Não consegui conectar à sala em tempo real. Confira a internet (e se a rede da escola não bloqueia WebSockets) e tente de novo.</p>
+      <p class="mut">A campanha individual continua funcionando normalmente.</p>
+      <button class="btn" id="kb">← Voltar</button></div></div>`;
+    $('#kb').onclick = showStart;
+    return;
+  }
+  const saved = store.get(KS_HOST);
+  const canResume = KH.canHost && saved && saved.gid && saved.st !== 'end' && Array.isArray(saved.deck) && saved.deck.length;
+  view.innerHTML = `<div class="wrap"><div class="card hero">
+    <div class="big pop">👥</div><h1>Modo Kahoot</h1>
+    <p class="mut">A turma joga ao mesmo tempo, cada um no seu aparelho. O placar aparece no telão.</p>
+    <button class="btn" id="kj">🎯 Entrar com PIN</button>
+    ${KH.canHost ? '<button class="btn alt" id="kh2">🎤 Criar sala (professor)</button>' : ''}
+    ${canResume ? `<button class="btn alt" id="kr">↩ Retomar a sala ${esc(saved.gid)}</button>` : ''}
+    <p><button class="btn alt" id="kb">← Voltar</button></p>
+    <p class="credits">Quem joga só precisa abrir este mesmo link e digitar o PIN.</p>
+  </div></div>`;
+  $('#kj').onclick = () => khJoinScreen();
+  if (KH.canHost) $('#kh2').onclick = khHostSetup;
+  if (canResume) $('#kr').onclick = khResume;
+  $('#kb').onclick = showStart;
+}
+
+function khJoinScreen() {
+  KH.role = null;
+  const old = store.get(KS_PLAYER) || {};
+  view.innerHTML = `<div class="wrap"><div class="card hero">
+    <div class="big">🎯</div><h2>Entrar na partida</h2>
+    <form id="jf" class="jform" autocomplete="off">
+      <label for="pin">PIN do jogo</label>
+      <input id="pin" inputmode="numeric" maxlength="6" placeholder="000000">
+      <label for="nick">Seu apelido</label>
+      <input id="nick" maxlength="16" placeholder="Como aparece no placar" value="${esc(old.nm || '')}">
+      <div class="jerr" id="jerr" aria-live="polite"></div>
+      <button class="btn" type="submit" id="jgo">Entrar</button>
+      <button class="btn alt" type="button" id="jback">← Voltar</button>
+    </form></div></div>`;
+  $('#jback').onclick = khMenu;
+  $('#jf').onsubmit = e => {
+    e.preventDefault();
+    khJoin($('#pin').value.replace(/\D/g, ''), $('#nick').value.replace(/[\u0000-\u001f]/g, '').trim());
+  };
+  $('#pin').focus();
+}
+
+async function khJoin(pin, nm) {
+  const btn = $('#jgo'), msg = m => { const e = $('#jerr'); if (e) e.textContent = m; };
+  const fail = m => { msg(m); if (btn) btn.disabled = false; };
+  if (!/^\d{6}$/.test(pin)) return fail('O PIN tem 6 números.');
+  if (!nm) return fail('Digite um apelido.');
+  if (btn) btn.disabled = true;
+  msg('Procurando a sala…');
+  const hostOf = () => KH.peers.find(p => p.presence && p.presence.role === 'h' && p.presence.gid === pin);
+  for (let k = 0; k < 16 && !hostOf(); k++) await sleep(250);
+  if (!hostOf()) return fail('Não achei essa sala. Confira o PIN e veja se o professor já criou a partida.');
+  if (khPlayers(pin).some(p => !p.me && p.nm.toLowerCase() === nm.toLowerCase())) return fail('Já tem alguém com esse apelido. Escolha outro.');
+  P = pLoad(pin, nm);
+  KH.role = 'player';
+  pSave(); pPub();
+  pSync();
+}
+
+/* ======================= professor ======================= */
+function khHostSetup() {
+  KH.role = null;
+  view.innerHTML = `<div class="wrap"><div class="card hero">
+    <div class="big">🎤</div><h2>Criar sala</h2>
+    <p class="mut">Você apresenta no telão e a turma responde pelos aparelhos.</p>
+    <div class="jform">
+      <label for="qn">Número de perguntas</label>
+      <select id="qn"><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option></select>
+      <label for="ql">Tempo por pergunta</label>
+      <select id="ql"><option value="15">15 segundos</option><option value="20" selected>20 segundos</option><option value="30">30 segundos</option></select>
+    </div>
+    <button class="btn" id="mk">Criar sala</button><button class="btn alt" id="bk">← Voltar</button>
+  </div></div>`;
+  $('#mk').onclick = () => khCreate(+$('#qn').value, +$('#ql').value);
+  $('#bk').onclick = khMenu;
+}
+
+function khCreate(n, lim) {
+  used = new Set(); lastTpl = null;
+  const t1 = Math.round(n * 0.3), t2 = Math.round(n * 0.4), deck = [];
+  for (let k = 0; k < n; k++) {
+    const q = pickQuestion(k < t1 ? 1 : k < t1 + t2 ? 2 : 3), sh = shuffle(q.options);
+    deck.push({ t: q.q, g: q.grid ? q.grid.rows : null, o: sh, c: sh.indexOf(q.correct), x: q.exp });
+  }
+  H = { gid: String(100000 + Math.floor(Math.random() * 900000)), deck, n, lim, i: -1, st: 'lobby', qStart: 0, revealing: false };
+  KH.role = 'host';
+  hostSave();
+  hostPub({ role: 'h', gid: H.gid, st: 'lobby', i: -1, n, lim, q: null, rv: null });
+  hostRender();
+}
+function khResume() {
+  const s = store.get(KS_HOST);
+  if (!s || !Array.isArray(s.deck)) return khHostSetup();
+  H = Object.assign({}, s, { qStart: Date.now(), revealing: false });
+  KH.role = 'host';
+  const d = H.deck[H.i];
+  hostPub({ role: 'h', gid: H.gid, st: H.st, i: H.i, n: H.n, lim: H.lim,
+    q: d && (H.st === 'q' || H.st === 'rv') ? { t: d.t, g: d.g, o: d.o } : null,
+    rv: d && H.st === 'rv' ? { c: d.c, x: d.x } : null });
+  hostRender();
+}
+function hostPub(patch) { if (KH.room) KH.room.presence(patch).catch(() => {}); }
+function hostSave() { if (H) store.set(KS_HOST, { gid: H.gid, deck: H.deck, n: H.n, lim: H.lim, i: H.i, st: H.st }); }
+
+function hostQuestion(idx) {
+  H.i = idx; H.st = 'q'; H.qStart = Date.now(); H.revealing = false;
+  const d = H.deck[idx];
+  hostPub({ st: 'q', i: idx, q: { t: d.t, g: d.g, o: d.o }, rv: null });
+  hostSave(); hostRender();
+}
+function hostReveal() {
+  if (!H || H.st !== 'q') return;
+  khStop(); H.revealing = true; H.st = 'rv';
+  const d = H.deck[H.i];
+  hostPub({ st: 'rv', rv: { c: d.c, x: d.x } });
+  hostSave(); sfx('ok'); hostRender();
+}
+function hostNext() { if (H.i + 1 < H.n) hostQuestion(H.i + 1); else hostEnd(); }
+function hostEnd() {
+  khStop(); H.st = 'end';
+  hostPub({ st: 'end', q: null, rv: null });
+  store.del(KS_HOST); sfx('win'); confetti(); hostRender();
+}
+function hostCancel() { store.del(KS_HOST); khExit(); }
+
+function hostTick() {
+  if (!H || H.st !== 'q') return;
+  const el = Date.now() - H.qStart, left = Math.max(0, H.lim - el / 1000);
+  const tm = $('#tm'), b = $('#tbar');
+  if (tm) tm.textContent = left > 0 ? Math.ceil(left) : '⏰';
+  if (b) b.style.width = (left / H.lim * 100) + '%';
+  if (el >= H.lim * 1000 + 1500) hostReveal();   // 1,5 s de folga para as respostas chegarem
+}
+
+function khQRDraw() {
+  const box = $('#qrbox'); if (!box) return;
+  const link = KH.link || location.href.split('#')[0].split('?')[0];
+  if (typeof qrcode !== 'function') { box.innerHTML = ''; return; }
+  try {
+    const q = qrcode(0, 'M'); q.addData(link); q.make();
+    box.innerHTML = '<div class="qrimg" role="img" aria-label="QR code para abrir o jogo">' + q.createSvgTag({ cellSize: 4, margin: 0, scalable: true }) + '</div>'
+      + '<p class="credits">Aponte a câmera do celular para abrir o jogo<br><span id="qrlink"></span></p>'
+      + '<button class="btn alt" id="qrchg">🔗 Trocar link do QR</button>';
+    $('#qrlink').textContent = link;
+    $('#qrchg').onclick = () => {
+      const v = prompt('Link que o QR code deve abrir:', link);
+      if (v && /^https?:\/\//i.test(v.trim())) { KH.link = v.trim(); khQRDraw(); }
+    };
+  } catch (e) { box.innerHTML = ''; }
+}
+
+function hostRender() {
+  khStop();
+  const d = H.deck[H.i];
+  if (H.st === 'lobby') {
+    view.innerHTML = `<div class="wrap wide">${warnBar()}<div class="card hero">
+      <p>Alunos: abram este mesmo link, toquem em <b>Modo Kahoot</b> e digitem o PIN</p>
+      <div class="pinbox" id="pin" aria-label="PIN do jogo">${H.gid}</div>
+      <div id="qrbox"></div>
+      <p><b id="pc">0</b> jogadores na sala</p>
+      <div class="chips" id="plist"></div>
+      <button class="btn" id="st" disabled>▶ Iniciar partida</button>
+      <button class="btn alt" id="ex">Sair</button>
+      <p class="credits">${H.n} perguntas · ${H.lim} segundos cada</p></div></div>`;
+    $('#st').onclick = () => hostQuestion(0);
+    $('#ex').onclick = hostCancel;
+    khQRDraw();
+  } else if (H.st === 'q') {
+    view.innerHTML = `<div class="wrap wide">${warnBar()}
+      <div class="card hud"><div class="stats"><span class="pill">Pergunta ${H.i + 1} de ${H.n}</span><span class="pill" id="cnt">0/0 responderam</span><span class="pill tmr" id="tm">${H.lim}</span></div>
+      <div class="bar"><i id="tbar" style="width:100%;transition:none"></i></div></div>
+      <div class="card">${d.g ? gridHTML({ rows: d.g }, true) : ''}<p class="qtext">${safeB(d.t)}</p>
+      <div class="tiles">${d.o.map((o, k) => `<div class="tile t${k}"><span class="shp">${KSHP[k]}</span><span class="tx">${safeB(o)}</span></div>`).join('')}</div></div>
+      <p style="text-align:center"><button class="btn alt" id="skip">⏭ Encerrar o tempo</button></p></div>`;
+    $('#skip').onclick = hostReveal;
+    KH.tick = setInterval(hostTick, 200);
+  } else if (H.st === 'rv') {
+    view.innerHTML = `<div class="wrap wide">${warnBar()}
+      <div class="card hud"><div class="stats"><span class="pill">Pergunta ${H.i + 1} de ${H.n}</span><span class="pill">Resultado</span></div></div>
+      <div class="card">${d.g ? gridHTML({ rows: d.g }, true) : ''}<p class="qtext">${safeB(d.t)}</p><div id="rvdyn"></div></div>
+      <p style="text-align:center"><button class="btn" id="nx">${H.i + 1 < H.n ? 'Próxima pergunta ➜' : '🏁 Ver resultado final'}</button>
+      <button class="btn alt" id="fin">Encerrar agora</button></p></div>`;
+    $('#nx').onclick = hostNext;
+    $('#fin').onclick = hostEnd;
+  } else {
+    view.innerHTML = `<div class="wrap wide">${warnBar()}<div class="card hero">
+      <div class="big pop">🏆</div><h1>Fim de jogo!</h1><div id="enddyn"></div>
+      <button class="btn" id="again">🔁 Nova partida</button><button class="btn alt" id="ex">Sair</button></div></div>`;
+    $('#again').onclick = khHostSetup;
+    $('#ex').onclick = khExit;
+  }
+  hostUpdate();
+  window.scrollTo({ top: 0 });
+}
+
+function hostUpdate() {
+  if (!H || KH.role !== 'host') return;
+  const cw = $('#connw'); if (cw) cw.hidden = KH.conn;
+  const pl = khBoard(H.gid);
+  if (H.st === 'lobby') {
+    $('#pc').textContent = pl.length;
+    $('#plist').innerHTML = pl.map(p => `<span class="chip">${esc(p.nm)}</span>`).join('') || '<span class="mut">Esperando jogadores…</span>';
+    $('#st').disabled = pl.length === 0;
+  } else if (H.st === 'q') {
+    const n = pl.filter(p => p.ai === H.i).length;
+    $('#cnt').textContent = `${n}/${pl.length} responderam`;
+    if (pl.length && n >= pl.length && !H.revealing) { H.revealing = true; setTimeout(hostReveal, 700); }
+  } else if (H.st === 'rv') {
+    const d = H.deck[H.i], cnt = [0, 0, 0, 0];
+    pl.forEach(p => { if (p.ai === H.i && p.ac >= 0 && p.ac < 4) cnt[p.ac]++; });
+    $('#rvdyn').innerHTML = `<div class="tiles">${d.o.map((o, k) =>
+      `<div class="tile t${k} ${k === d.c ? 'right' : 'dim'}"><span class="shp">${KSHP[k]}</span><span class="tx">${k === d.c ? '✓ ' : ''}${safeB(o)}</span><b class="cn">${cnt[k]}</b></div>`).join('')}</div>
+      <div class="fb ok"><p>💡 ${safeB(d.x)}</p></div>
+      <h3>Placar</h3>${boardHTML(pl, 5, true)}`;
+  } else {
+    $('#enddyn').innerHTML = podiumHTML(pl) + boardHTML(pl, 12, false);
+  }
+}
+
+/* ======================= aluno ======================= */
+function pLoad(gid, nm) {
+  const base = { gid, nm, sc: 0, sk: 0, dl: 0, scored: -1, ai: -1, ac: -1, ams: 0, ok: false };
+  const o = store.get(KS_PLAYER);
+  const p = (o && o.gid === gid && o.nm === nm) ? Object.assign(base, o) : base;
+  return Object.assign(p, { curQ: -1, qShown: 0, locked: false, timedOut: false, key: '' });
+}
+function pSave() { if (P) store.set(KS_PLAYER, { gid: P.gid, nm: P.nm, sc: P.sc, sk: P.sk, dl: P.dl, scored: P.scored, ai: P.ai, ac: P.ac, ams: P.ams, ok: P.ok }); }
+function pPub() {
+  if (!KH.room || !P) return;
+  KH.room.presence({ role: 'p', gid: P.gid, nm: P.nm, sc: P.sc, sk: P.sk, dl: P.dl, ai: P.ai, ac: P.ac, ams: P.ams, si: P.scored, ok: P.ok }).catch(() => {});
+}
+function findHost() {
+  const hs = KH.peers.filter(p => p.presence && p.presence.role === 'h' && p.presence.gid === P.gid);
+  return hs.length ? hs.sort((a, b) => b.updatedAt - a.updatedAt)[0].presence : null;
+}
+function rankText() {
+  const l = khBoard(P.gid), k = l.findIndex(p => p.me);
+  return k < 0 ? '' : `Você está em <b>${k + 1}º lugar</b> de ${l.length} · ${fmt(P.sc)} pontos`;
+}
+
+/* pontos: até 1000 por rapidez (mínimo 500) + bônus de sequência (100 por acerto seguido, até 500) */
+function pScore(h) {
+  if (P.scored === h.i || !h.rv) return;
+  const right = P.ai === h.i && P.ac === h.rv.c;
+  if (right) {
+    const ratio = Math.min(1, Math.max(0, P.ams / (clampLim(h.lim) * 1000)));
+    P.dl = Math.round((1 - ratio / 2) * 1000) + Math.min(P.sk, 5) * 100;
+    P.sc += P.dl; P.sk += 1; P.ok = true; sfx('ok');
+  } else { P.dl = 0; P.sk = 0; P.ok = false; sfx('bad'); }
+  P.scored = h.i; pSave(); pPub();
+}
+
+function pSync() {
+  if (!P || KH.role !== 'player') return;
+  const h = findHost(), hasQ = h && h.q && Array.isArray(h.q.o);
+  let key;
+  if (!h) { khStop(); key = 'nohost'; }
+  else if (h.st === 'lobby') { khStop(); key = 'lobby'; }
+  else if (h.st === 'q' && hasQ) {
+    if (P.curQ !== h.i) {
+      khStop();
+      P.curQ = h.i; P.qShown = performance.now(); P.locked = P.ai === h.i; P.timedOut = false;
+      const i = h.i;
+      KH.tick = setInterval(pTick, 200);
+      KH.tm = setTimeout(() => { if (P && P.curQ === i && !P.locked) { P.timedOut = true; pSync(); } }, clampLim(h.lim) * 1000);
+    }
+    key = 'q' + h.i + (P.locked ? 'L' : '') + (P.timedOut ? 'T' : '');
+  } else if (h.st === 'rv' && hasQ && h.rv) { khStop(); pScore(h); key = 'rv' + h.i; }
+  else if (h.st === 'end') { khStop(); key = 'end'; }
+  else key = 'wait';
+  if (key !== P.key) { P.key = key; pRender(h); }
+  pUpdate(h);
+}
+
+function pTick() {
+  const h = P && findHost(), tm = $('#ptm');
+  if (!tm || !h || h.st !== 'q') return;
+  const lim = clampLim(h.lim), left = Math.max(0, lim - (performance.now() - P.qShown) / 1000);
+  tm.textContent = left > 0 ? Math.ceil(left) : '⏰';
+  const b = $('#ptbar'); if (b) b.style.width = (left / lim * 100) + '%';
+}
+
+function pAnswer(k) {
+  const h = findHost();
+  if (!h || h.st !== 'q' || P.locked || P.timedOut || P.curQ !== h.i) return;
+  const ms = Math.max(0, Math.round(performance.now() - P.qShown));
+  if (ms > clampLim(h.lim) * 1000 + 800) return;
+  P.locked = true; P.ai = h.i; P.ac = k; P.ams = ms;
+  pSave(); pPub(); pSync();
+}
+
+function pUpdate(h) {
+  const cw = $('#connw'); if (cw) cw.hidden = KH.conn;
+  const sc = $('#psc'); if (sc) sc.textContent = '⭐ ' + fmt(P.sc);
+  const pr = $('#prank'); if (pr) pr.innerHTML = rankText();
+  const pd = $('#pdyn');
+  if (pd && h && h.st === 'end') { const l = khBoard(P.gid); pd.innerHTML = podiumHTML(l) + boardHTML(l, 5, false); }
+}
+
+function pRender(h) {
+  const head = (extra) => `<div class="card hud"><div class="stats"><span class="pill">🎮 ${esc(P.nm)}</span><span class="pill" id="psc">⭐ ${fmt(P.sc)}</span>${extra || ''}</div></div>`;
+  const leave = `<button class="btn alt" id="px">Sair da partida</button>`;
+  const bindLeave = () => { const b = $('#px'); if (b) b.onclick = () => { store.del(KS_PLAYER); khExit(); }; };
+  const k = P.key;
+  if (k === 'nohost' || k === 'wait') {
+    view.innerHTML = `<div class="wrap">${warnBar()}<div class="card hero"><div class="big">📡</div>
+      <h2>${k === 'wait' ? 'Carregando a pergunta…' : 'Aguardando o professor…'}</h2>
+      <p class="mut">Sala ${esc(P.gid)}. Se a partida acabou, saia e entre de novo com o novo PIN.</p>${leave}</div></div>`;
+  } else if (k === 'lobby') {
+    view.innerHTML = `<div class="wrap">${warnBar()}<div class="card hero"><div class="big pop">✅</div>
+      <h2>Você entrou, ${esc(P.nm)}!</h2>
+      <p>Seu nome já aparece no telão. Quando o professor iniciar, as perguntas surgem aqui.</p>${leave}</div></div>`;
+  } else if (k[0] === 'q') {
+    const q = h.q, answered = P.ai === h.i, lim = clampLim(h.lim);
+    const msg = answered ? '✅ Resposta enviada! Olhe o telão.' : P.timedOut ? '⏰ Tempo esgotado.' : '';
+    view.innerHTML = `<div class="wrap">${warnBar()}
+      ${head(`<span class="pill">Pergunta ${h.i + 1} de ${+h.n || '?'}</span><span class="pill tmr" id="ptm">${lim}</span>`).replace('</div></div>', '</div><div class="bar"><i id="ptbar" style="width:100%;transition:none"></i></div></div>')}
+      <div class="card">${Array.isArray(q.g) ? gridHTML({ rows: q.g }, true) : ''}<p class="qtext">${safeB(q.t)}</p>
+      <div class="tiles">${q.o.slice(0, 4).map((o, j) => `<button class="tile t${j}${answered && P.ac === j ? ' pick' : ''}${(P.locked || P.timedOut) && !(answered && P.ac === j) ? ' dim' : ''}" data-k="${j}" ${P.locked || P.timedOut ? 'disabled' : ''}><span class="shp">${KSHP[j]}</span><span class="tx">${safeB(o)}</span></button>`).join('')}</div>
+      <p class="mut" style="text-align:center">${msg}</p></div></div>`;
+    view.querySelectorAll('.tile').forEach(b => { b.onclick = () => pAnswer(+b.dataset.k); });
+    pTick();
+  } else if (k.slice(0, 2) === 'rv') {
+    const q = h.q, c = h.rv.c;
+    const right = P.ok && P.scored === h.i, answered = P.ai === h.i;
+    view.innerHTML = `<div class="wrap">${warnBar()}${head()}
+      <div class="card hero"><div class="big pop">${right ? '✅' : answered ? '❌' : '⏰'}</div>
+      <h2>${right ? 'Correto!' : answered ? 'Não foi dessa vez' : 'Sem resposta'}</h2>
+      <p><b>${right ? '+' + fmt(P.dl) : '0'} pontos</b>${P.sk >= 2 ? ` · 🔥 ${P.sk} acertos seguidos` : ''}</p>
+      <p id="prank"></p>
+      <div class="tiles"><div class="tile t${c} right"><span class="shp">${KSHP[c]}</span><span class="tx">✓ ${safeB(q.o[c])}</span></div></div>
+      <div class="fb ok"><p>💡 ${safeB(h.rv.x)}</p></div></div></div>`;
+    if (right) confetti();
+  } else {
+    const top3 = khBoard(P.gid).findIndex(p => p.me) < 3;
+    view.innerHTML = `<div class="wrap">${warnBar()}${head()}
+      <div class="card hero"><div class="big pop">${top3 ? '🏆' : '🎉'}</div><h1>Fim de jogo!</h1>
+      <p id="prank"></p><div id="pdyn"></div>${leave}</div></div>`;
+    sfx('win'); if (top3) confetti();
+  }
+  bindLeave();
+  window.scrollTo({ top: 0 });
+}
+
+/* atalhos de teclado: A–D ou 1–4 escolhem a alternativa */
+document.addEventListener('keydown', e => {
+  if (!S || !S.q || S.answered || !view.querySelector('.opt')) return;
+  const k = 'abcd1234'.indexOf(e.key.toLowerCase());
+  if (k >= 0) answer(k % 4);
+});
+
+showStart();
 </script>
-</body>
-</html>
+
+</body></html>
